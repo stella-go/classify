@@ -1,0 +1,830 @@
+{
+    "entities": [
+        {
+            "type": "primary_key",
+            "name": "主键",
+            "description": "表的主键或自增ID",
+            "keywords": ["主键", "自增", "auto_increment", "primary", "pk"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "personal_identifier",
+            "name": "个人标识符",
+            "description": "用于唯一标识个人身份的信息",
+            "keywords": ["user_id", "uid", "member_id", "customer_id", "account_id", "person_id", "buyer_id", "seller_id", "payer_id", "emp_id", "staff_id", "openid", "unionid"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "name",
+            "name": "姓名",
+            "description": "个人真实姓名或昵称",
+            "keywords": ["name", "username", "nickname", "real_name", "full_name", "first_name", "last_name", "姓名", "用户名"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "id_card",
+            "name": "身份证号",
+            "description": "身份证件号码",
+            "keywords": ["id_card", "id_number", "identity", "ssn", "social_security", "身份证"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "phone",
+            "name": "电话号码",
+            "description": "手机号码或固定电话",
+            "keywords": ["phone", "mobile", "telephone", "tel", "cellphone", "contact_number", "手机", "电话"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "email",
+            "name": "电子邮箱",
+            "description": "电子邮件地址",
+            "keywords": ["email", "mail", "e_mail", "邮箱"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "address",
+            "name": "地址",
+            "description": "详细地址信息",
+            "keywords": ["address", "location", "street", "city", "province", "country", "zip", "postal", "地址", "住址"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "ip_address",
+            "name": "IP地址",
+            "description": "网络IP地址",
+            "keywords": ["ip", "ip_address", "ipv4", "ipv6", "client_ip", "server_ip"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "device_id",
+            "name": "设备标识",
+            "description": "设备唯一标识符",
+            "keywords": ["device_id", "imei", "imsi", "mac_address", "udid", "device_token", "uuid", "device_uuid"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "bank_account",
+            "name": "银行账户",
+            "description": "银行卡号或账户信息",
+            "keywords": ["bank_card", "bank_account", "card_number", "account_number", "card_no", "account_no", "card", "银行卡", "卡号", "账号"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "password",
+            "name": "密码",
+            "description": "密码或加密凭证",
+            "keywords": ["password", "pwd", "secret", "credential", "pass_hash", "密码"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "token",
+            "name": "令牌",
+            "description": "访问令牌或密钥",
+            "keywords": ["token", "access_token", "refresh_token", "api_key", "secret_key", "session_id"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "salary",
+            "name": "薪资",
+            "description": "工资或收入信息",
+            "keywords": ["salary", "income", "wage", "compensation", "bonus", "工资", "收入"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "transaction_amount",
+            "name": "交易金额",
+            "description": "交易相关金额",
+            "keywords": ["amount", "price", "total", "payment", "balance", "金额", "价格"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "order_id",
+            "name": "订单号",
+            "description": "订单唯一标识",
+            "keywords": ["order_id", "order_no", "order_number", "trade_no", "transaction_id", "订单号"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "company_id",
+            "name": "企业标识",
+            "description": "企业唯一标识符",
+            "keywords": ["company_id", "enterprise_id", "org_id", "organization_id", "corp_id"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "company_name",
+            "name": "企业名称",
+            "description": "企业或组织名称",
+            "keywords": ["company_name", "enterprise_name", "org_name", "organization_name", "corp_name", "公司名"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "business_license",
+            "name": "营业执照",
+            "description": "企业营业执照号",
+            "keywords": ["business_license", "license_no", "registration_no", "统一社会信用代码", "营业执照"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "legal_representative",
+            "name": "法定代表人",
+            "description": "企业法定代表人信息",
+            "keywords": ["legal_representative", "legal_person", "法人", "法定代表人"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "datetime",
+            "name": "时间日期",
+            "description": "时间或日期信息",
+            "keywords": ["date", "time", "datetime", "timestamp", "created_at", "updated_at", "birth", "birthday", "日期", "时间"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "age",
+            "name": "年龄",
+            "description": "年龄信息",
+            "keywords": ["age", "年龄"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "gender",
+            "name": "性别",
+            "description": "性别信息",
+            "keywords": ["gender", "sex", "性别"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "biometric",
+            "name": "生物特征",
+            "description": "生物识别信息",
+            "keywords": ["fingerprint", "face", "facial", "iris", "voice_print", "指纹", "人脸", "虹膜"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "health",
+            "name": "健康信息",
+            "description": "健康或医疗信息",
+            "keywords": ["health", "medical", "disease", "diagnosis", "treatment", "健康", "医疗", "病历"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "religion",
+            "name": "宗教信仰",
+            "description": "宗教或信仰信息",
+            "keywords": ["religion", "belief", "faith", "宗教", "信仰"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "political",
+            "name": "政治面貌",
+            "description": "政治相关信息",
+            "keywords": ["political", "party", "政治面貌", "党派"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "ethnicity",
+            "name": "民族",
+            "description": "民族信息",
+            "keywords": ["ethnicity", "race", "nationality", "民族"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "education",
+            "name": "教育信息",
+            "description": "学历或教育背景",
+            "keywords": ["education", "degree", "school", "university", "major", "学历", "学校"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "work_experience",
+            "name": "工作经历",
+            "description": "职业或工作经历",
+            "keywords": ["job", "position", "title", "department", "work_experience", "职位", "部门"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "location_track",
+            "name": "位置轨迹",
+            "description": "地理位置追踪数据",
+            "keywords": ["latitude", "longitude", "gps", "geo", "coordinates", "track", "lat", "lng", "经度", "纬度"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "behavior_log",
+            "name": "行为日志",
+            "description": "用户行为记录",
+            "keywords": ["action", "behavior", "operation", "click", "visit", "browse", "行为", "操作"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "page_path",
+            "name": "页面路径",
+            "description": "网页或应用页面路径",
+            "keywords": ["page", "path", "page_url", "page_path", "route", "页面", "路径"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "referrer",
+            "name": "来源页面",
+            "description": "访问来源页面或引荐来源",
+            "keywords": ["referrer", "referer", "refer", "from_page", "来源页面"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "user_agent",
+            "name": "用户代理",
+            "description": "浏览器User-Agent信息",
+            "keywords": ["user_agent", "ua", "browser", "用户代理"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "preference",
+            "name": "偏好信息",
+            "description": "用户偏好或兴趣",
+            "keywords": ["preference", "interest", "hobby", "favorite", "偏好", "兴趣"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "social_account",
+            "name": "社交账号",
+            "description": "社交媒体账号信息",
+            "keywords": ["wechat", "weibo", "qq", "twitter", "facebook", "instagram", "tiktok", "微信", "微博"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "product_id",
+            "name": "产品标识",
+            "description": "产品或商品唯一标识",
+            "keywords": ["product_id", "sku", "item_id", "goods_id", "商品ID"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "product_name",
+            "name": "产品名称",
+            "description": "产品或商品名称",
+            "keywords": ["product_name", "item_name", "goods_name", "商品名"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "category",
+            "name": "分类",
+            "description": "分类或类目信息",
+            "keywords": ["category", "type", "class", "分类", "类目"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "status",
+            "name": "状态",
+            "description": "状态标识",
+            "keywords": ["status", "state", "flag", "状态"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "description",
+            "name": "描述",
+            "description": "描述性文本",
+            "keywords": ["description", "desc", "remark", "comment", "note", "描述", "备注"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "url",
+            "name": "链接地址",
+            "description": "URL或链接",
+            "keywords": ["url", "link", "href", "uri", "链接"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "image",
+            "name": "图片",
+            "description": "图片资源",
+            "keywords": ["image", "img", "photo", "picture", "avatar", "图片", "头像"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "file",
+            "name": "文件",
+            "description": "文件资源",
+            "keywords": ["file", "document", "attachment", "文件", "附件"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "count",
+            "name": "计数",
+            "description": "数量或统计值",
+            "keywords": ["count", "num", "number", "quantity", "total", "数量"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "rate",
+            "name": "比率",
+            "description": "比率或百分比",
+            "keywords": ["rate", "ratio", "percentage", "percent", "比率", "百分比"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "score",
+            "name": "评分",
+            "description": "评分或打分",
+            "keywords": ["score", "rating", "grade", "评分", "打分"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "version",
+            "name": "版本",
+            "description": "版本信息",
+            "keywords": ["version", "ver", "revision", "版本"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "passport",
+            "name": "护照号",
+            "description": "护照证件号码",
+            "keywords": ["passport", "passport_no", "passport_number", "护照"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "driver_license",
+            "name": "驾驶证号",
+            "description": "驾驶证件号码",
+            "keywords": ["driver_license", "driving_license", "驾驶证", "驾照"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "vehicle_info",
+            "name": "车辆信息",
+            "description": "车牌号或车辆识别码",
+            "keywords": ["vehicle", "car", "plate", "vin", "车牌", "车辆"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "credit_card",
+            "name": "信用卡",
+            "description": "信用卡号及相关信息",
+            "keywords": ["credit_card", "credit_no", "cvv", "expiry", "信用卡"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "alipay_account",
+            "name": "支付宝账号",
+            "description": "支付宝账户信息",
+            "keywords": ["alipay", "ali_account", "支付宝"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "wechat_pay",
+            "name": "微信支付",
+            "description": "微信支付账户信息",
+            "keywords": ["wechat_pay", "wxpay", "微信支付"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "insurance",
+            "name": "保险信息",
+            "description": "保险单号或保险相关信息",
+            "keywords": ["insurance", "policy", "保险", "保单"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "loan",
+            "name": "贷款信息",
+            "description": "贷款或借贷信息",
+            "keywords": ["loan", "credit", "debt", "borrow", "贷款", "借款"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "tax_info",
+            "name": "税务信息",
+            "description": "纳税人识别号或税务信息",
+            "keywords": ["tax", "tax_no", "taxpayer", "税号", "纳税"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "social_security",
+            "name": "社保信息",
+            "description": "社会保险相关信息",
+            "keywords": ["social_security", "social_insurance", "pension", "社保", "养老金"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "housing_fund",
+            "name": "公积金",
+            "description": "住房公积金信息",
+            "keywords": ["housing_fund", "provident_fund", "公积金"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "marriage",
+            "name": "婚姻状况",
+            "description": "婚姻状态信息",
+            "keywords": ["marriage", "marital", "spouse", "婚姻", "配偶"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "family_relation",
+            "name": "家庭关系",
+            "description": "家庭成员关系信息",
+            "keywords": ["family", "parent", "child", "relative", "emergency_contact", "家庭", "亲属", "紧急联系人"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "criminal_record",
+            "name": "犯罪记录",
+            "description": "犯罪或违法记录",
+            "keywords": ["criminal", "crime", "violation", "犯罪", "违法"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "credit_score",
+            "name": "信用评分",
+            "description": "个人或企业信用评分",
+            "keywords": ["credit_score", "credit_rating", "credit_level", "信用分", "征信"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "contract",
+            "name": "合同信息",
+            "description": "合同编号或合同内容",
+            "keywords": ["contract", "agreement", "contract_no", "合同", "协议"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "invoice",
+            "name": "发票信息",
+            "description": "发票号码或发票内容",
+            "keywords": ["invoice", "invoice_no", "receipt", "发票", "收据"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "logistics",
+            "name": "物流信息",
+            "description": "快递单号或物流信息",
+            "keywords": ["logistics", "express", "tracking", "shipment", "waybill", "物流", "快递", "运单"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "coupon",
+            "name": "优惠券",
+            "description": "优惠券或促销码",
+            "keywords": ["coupon", "voucher", "promo", "discount", "优惠券", "折扣"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "membership",
+            "name": "会员等级",
+            "description": "会员等级或积分",
+            "keywords": ["membership", "member_level", "vip", "points", "会员", "积分"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "browser_fingerprint",
+            "name": "浏览器指纹",
+            "description": "浏览器指纹信息",
+            "keywords": ["fingerprint", "browser_id", "canvas", "浏览器指纹"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "cookie",
+            "name": "Cookie",
+            "description": "浏览器Cookie信息",
+            "keywords": ["cookie", "session", "cookie_id"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "app_version",
+            "name": "应用版本",
+            "description": "应用程序版本信息",
+            "keywords": ["app_version", "client_version", "sdk_version", "应用版本"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "os_info",
+            "name": "操作系统",
+            "description": "操作系统信息",
+            "keywords": ["os", "operating_system", "platform", "android", "ios", "windows", "操作系统"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "network_info",
+            "name": "网络信息",
+            "description": "网络类型或运营商信息",
+            "keywords": ["network", "carrier", "wifi", "cellular", "4g", "5g", "网络", "运营商"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "screen_info",
+            "name": "屏幕信息",
+            "description": "屏幕分辨率或尺寸",
+            "keywords": ["screen", "resolution", "display", "屏幕", "分辨率"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "search_history",
+            "name": "搜索历史",
+            "description": "用户搜索记录",
+            "keywords": ["search", "query", "keyword", "搜索", "关键词"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "browse_history",
+            "name": "浏览历史",
+            "description": "用户浏览记录",
+            "keywords": ["browse", "history", "view", "浏览记录", "访问记录"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "purchase_history",
+            "name": "购买历史",
+            "description": "用户购买记录",
+            "keywords": ["purchase", "buy", "shopping", "购买记录", "消费记录"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "chat_content",
+            "name": "聊天内容",
+            "description": "即时通讯聊天内容",
+            "keywords": ["chat", "message", "im", "conversation", "聊天", "消息"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "notification",
+            "name": "通知消息",
+            "description": "推送通知或系统消息",
+            "keywords": ["notification", "push", "alert", "通知", "推送"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "feedback",
+            "name": "用户反馈",
+            "description": "用户反馈或投诉",
+            "keywords": ["feedback", "complaint", "suggestion", "反馈", "投诉", "建议"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "review",
+            "name": "评价评论",
+            "description": "用户评价或评论内容",
+            "keywords": ["review", "comment", "评价", "评论"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "like_collect",
+            "name": "点赞收藏",
+            "description": "点赞或收藏记录",
+            "keywords": ["like", "favorite", "collect", "bookmark", "点赞", "收藏"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "share",
+            "name": "分享记录",
+            "description": "用户分享行为记录",
+            "keywords": ["share", "forward", "分享", "转发"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "certification",
+            "name": "认证信息",
+            "description": "实名认证或资质认证",
+            "keywords": ["certification", "verify", "verified", "认证", "核验"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "risk_label",
+            "name": "风险标签",
+            "description": "风控标签或黑名单",
+            "keywords": ["risk", "blacklist", "whitelist", "fraud", "风险", "黑名单", "白名单"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "algorithm_score",
+            "name": "算法评分",
+            "description": "算法模型输出的评分",
+            "keywords": ["algorithm", "model", "predict", "recommend", "算法", "模型", "预测"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "ab_test",
+            "name": "AB测试",
+            "description": "AB测试分组信息",
+            "keywords": ["ab_test", "experiment", "variant", "实验", "分组"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "audit_log",
+            "name": "审计日志",
+            "description": "系统审计或操作日志",
+            "keywords": ["audit", "audit_log", "operation_log", "审计", "操作日志"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "error_log",
+            "name": "错误日志",
+            "description": "系统错误或异常日志",
+            "keywords": ["error", "exception", "crash", "bug", "错误", "异常"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "performance_metric",
+            "name": "性能指标",
+            "description": "系统性能监控指标",
+            "keywords": ["performance", "metric", "latency", "throughput", "性能", "延迟"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "api_key",
+            "name": "API密钥",
+            "description": "API访问密钥或凭证",
+            "keywords": ["api_key", "app_key", "app_secret", "client_secret", "密钥"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "encryption_key",
+            "name": "加密密钥",
+            "description": "数据加密密钥",
+            "keywords": ["encryption_key", "private_key", "public_key", "aes_key", "rsa_key", "加密密钥"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "certificate",
+            "name": "证书",
+            "description": "SSL证书或数字证书",
+            "keywords": ["certificate", "cert", "ssl", "tls", "ca", "证书"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "config",
+            "name": "配置信息",
+            "description": "系统配置或参数",
+            "keywords": ["config", "setting", "parameter", "配置", "参数"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "internal_id",
+            "name": "内部标识",
+            "description": "内部系统标识符",
+            "keywords": ["internal_id", "trace_id", "span_id", "request_id", "内部ID"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "external_id",
+            "name": "外部标识",
+            "description": "第三方系统标识符",
+            "keywords": ["external_id", "third_party_id", "partner_id", "外部ID"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "shareholder",
+            "name": "股东信息",
+            "description": "企业股东信息",
+            "keywords": ["shareholder", "investor", "股东", "投资人"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "revenue",
+            "name": "营收信息",
+            "description": "企业营收或财务数据",
+            "keywords": ["revenue", "profit", "financial", "turnover", "营收", "利润", "财务"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "employee_count",
+            "name": "员工人数",
+            "description": "企业员工规模",
+            "keywords": ["employee_count", "staff_count", "headcount", "员工人数", "规模"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "trademark",
+            "name": "商标信息",
+            "description": "商标或知识产权信息",
+            "keywords": ["trademark", "patent", "copyright", "intellectual_property", "商标", "专利", "知识产权"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "bid_info",
+            "name": "招投标信息",
+            "description": "招标投标相关信息",
+            "keywords": ["bid", "tender", "招标", "投标"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "qualification",
+            "name": "资质信息",
+            "description": "企业或个人资质证书",
+            "keywords": ["qualification", "certificate", "license", "资质", "许可证"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "content_text",
+            "name": "内容文本",
+            "description": "UGC内容或文章文本",
+            "keywords": ["content", "text", "article", "post", "内容", "文章"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "media_video",
+            "name": "视频资源",
+            "description": "视频文件或流媒体",
+            "keywords": ["video", "media", "stream", "视频", "流媒体"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "audio",
+            "name": "音频资源",
+            "description": "音频文件或语音",
+            "keywords": ["audio", "voice", "sound", "音频", "语音"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "sensitive_word",
+            "name": "敏感词",
+            "description": "敏感词或违禁词",
+            "keywords": ["sensitive", "forbidden", "banned", "敏感词", "违禁词"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "real_name_auth",
+            "name": "实名认证",
+            "description": "实名认证信息",
+            "keywords": ["real_name", "kyc", "identity_verify", "实名", "认证"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "face_recognition",
+            "name": "人脸识别",
+            "description": "人脸识别相关数据",
+            "keywords": ["face_id", "face_recognition", "liveness", "人脸识别", "活体检测"],
+            "defaultLevel": 4
+        },
+        {
+            "type": "ocr_result",
+            "name": "OCR识别结果",
+            "description": "OCR识别的文字内容",
+            "keywords": ["ocr", "recognize", "extract", "识别结果"],
+            "defaultLevel": 3
+        },
+        {
+            "type": "geographic_region",
+            "name": "地理区域",
+            "description": "省市区等行政区划",
+            "keywords": ["region", "province", "city", "district", "area", "省", "市", "区"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "timezone",
+            "name": "时区",
+            "description": "时区信息",
+            "keywords": ["timezone", "tz", "时区"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "language",
+            "name": "语言",
+            "description": "语言偏好或区域设置",
+            "keywords": ["language", "locale", "lang", "语言"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "currency",
+            "name": "货币",
+            "description": "货币类型或汇率",
+            "keywords": ["currency", "exchange_rate", "货币", "汇率"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "refund",
+            "name": "退款信息",
+            "description": "退款记录或退货信息",
+            "keywords": ["refund", "return", "chargeback", "退款", "退货"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "subscription",
+            "name": "订阅信息",
+            "description": "订阅或自动续费信息",
+            "keywords": ["subscription", "subscribe", "auto_renew", "订阅", "续费"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "advertising_id",
+            "name": "广告标识",
+            "description": "广告追踪标识符",
+            "keywords": ["idfa", "gaid", "advertising_id", "ad_id", "广告ID"],
+            "defaultLevel": 2
+        },
+        {
+            "type": "utm_source",
+            "name": "流量来源",
+            "description": "营销渠道来源标记",
+            "keywords": ["utm", "source", "channel", "campaign", "渠道", "来源"],
+            "defaultLevel": 1
+        },
+        {
+            "type": "conversion",
+            "name": "转化数据",
+            "description": "营销转化或ROI数据",
+            "keywords": ["conversion", "roi", "cpa", "cpc", "转化", "投放"],
+            "defaultLevel": 2
+        }
+    ]
+}

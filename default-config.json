@@ -1,0 +1,1112 @@
+{
+    "version": "1.0",
+    "description": "互联网公司数据分类分级标准表",
+    "levels": {
+        "1": {
+            "name": "公开数据",
+            "description": "可公开访问的数据，泄露不会造成影响"
+        },
+        "2": {
+            "name": "内部数据",
+            "description": "仅限内部使用的数据，泄露可能造成轻微影响"
+        },
+        "3": {
+            "name": "敏感数据",
+            "description": "敏感性数据，泄露可能造成较大影响"
+        },
+        "4": {
+            "name": "高度敏感数据",
+            "description": "核心敏感数据，泄露会造成严重影响"
+        }
+    },
+    "tables": [
+        {
+            "tableName": "user_basic_info",
+            "tableNameCn": "用户基本信息表",
+            "keywords": ["user", "member", "customer", "account", "用户", "会员", "客户"],
+            "category": "用户数据",
+            "level": 3,
+            "description": "存储用户基本身份信息",
+            "columns": [
+                {
+                    "columnName": "user_id",
+                    "columnNameCn": "用户ID",
+                    "category": "标识信息",
+                    "level": 3,
+                    "entityType": "personal_identifier",
+                    "description": "用户唯一标识符"
+                },
+                {
+                    "columnName": "username",
+                    "columnNameCn": "用户名",
+                    "category": "身份信息",
+                    "level": 3,
+                    "entityType": "name",
+                    "description": "用户登录名"
+                },
+                {
+                    "columnName": "real_name",
+                    "columnNameCn": "真实姓名",
+                    "category": "身份信息",
+                    "level": 4,
+                    "entityType": "name",
+                    "description": "用户真实姓名"
+                },
+                {
+                    "columnName": "id_card",
+                    "columnNameCn": "身份证号",
+                    "category": "证件信息",
+                    "level": 4,
+                    "entityType": "id_card",
+                    "description": "身份证号码"
+                },
+                {
+                    "columnName": "phone",
+                    "columnNameCn": "手机号",
+                    "category": "联系方式",
+                    "level": 4,
+                    "entityType": "phone",
+                    "description": "手机号码"
+                },
+                {
+                    "columnName": "email",
+                    "columnNameCn": "邮箱",
+                    "category": "联系方式",
+                    "level": 3,
+                    "entityType": "email",
+                    "description": "电子邮箱地址"
+                },
+                {
+                    "columnName": "password",
+                    "columnNameCn": "密码",
+                    "category": "认证信息",
+                    "level": 4,
+                    "entityType": "password",
+                    "description": "用户密码哈希"
+                },
+                {
+                    "columnName": "avatar",
+                    "columnNameCn": "头像",
+                    "category": "个人资料",
+                    "level": 2,
+                    "entityType": "image",
+                    "description": "用户头像URL"
+                },
+                {
+                    "columnName": "gender",
+                    "columnNameCn": "性别",
+                    "category": "个人信息",
+                    "level": 2,
+                    "entityType": "gender",
+                    "description": "用户性别"
+                },
+                {
+                    "columnName": "birthday",
+                    "columnNameCn": "生日",
+                    "category": "个人信息",
+                    "level": 2,
+                    "entityType": "datetime",
+                    "description": "出生日期"
+                },
+                {
+                    "columnName": "address",
+                    "columnNameCn": "地址",
+                    "category": "联系方式",
+                    "level": 3,
+                    "entityType": "address",
+                    "description": "详细地址"
+                },
+                {
+                    "columnName": "created_at",
+                    "columnNameCn": "创建时间",
+                    "category": "系统字段",
+                    "level": 1,
+                    "entityType": "datetime",
+                    "description": "账户创建时间"
+                },
+                {
+                    "columnName": "updated_at",
+                    "columnNameCn": "更新时间",
+                    "category": "系统字段",
+                    "level": 1,
+                    "entityType": "datetime",
+                    "description": "账户更新时间"
+                },
+                {
+                    "columnName": "status",
+                    "columnNameCn": "状态",
+                    "category": "系统字段",
+                    "level": 1,
+                    "entityType": "status",
+                    "description": "账户状态"
+                }
+            ]
+        },
+        {
+            "tableName": "user_auth_info",
+            "tableNameCn": "用户认证信息表",
+            "keywords": ["auth", "login", "credential", "认证", "登录"],
+            "category": "认证数据",
+            "level": 4,
+            "description": "存储用户认证和登录凭证",
+            "columns": [
+                {
+                    "columnName": "user_id",
+                    "columnNameCn": "用户ID",
+                    "category": "标识信息",
+                    "level": 3,
+                    "entityType": "personal_identifier",
+                    "description": "用户唯一标识符"
+                },
+                {
+                    "columnName": "password_hash",
+                    "columnNameCn": "密码哈希",
+                    "category": "认证信息",
+                    "level": 4,
+                    "entityType": "password",
+                    "description": "密码加密哈希值"
+                },
+                {
+                    "columnName": "salt",
+                    "columnNameCn": "密码盐值",
+                    "category": "认证信息",
+                    "level": 4,
+                    "entityType": "password",
+                    "description": "密码加密盐值"
+                },
+                {
+                    "columnName": "access_token",
+                    "columnNameCn": "访问令牌",
+                    "category": "认证信息",
+                    "level": 4,
+                    "entityType": "token",
+                    "description": "访问令牌"
+                },
+                {
+                    "columnName": "refresh_token",
+                    "columnNameCn": "刷新令牌",
+                    "category": "认证信息",
+                    "level": 4,
+                    "entityType": "token",
+                    "description": "刷新令牌"
+                },
+                {
+                    "columnName": "last_login_time",
+                    "columnNameCn": "最后登录时间",
+                    "category": "登录信息",
+                    "level": 2,
+                    "entityType": "datetime",
+                    "description": "最后登录时间"
+                },
+                {
+                    "columnName": "last_login_ip",
+                    "columnNameCn": "最后登录IP",
+                    "category": "登录信息",
+                    "level": 2,
+                    "entityType": "ip_address",
+                    "description": "最后登录IP地址"
+                },
+                {
+                    "columnName": "device_id",
+                    "columnNameCn": "设备ID",
+                    "category": "设备信息",
+                    "level": 2,
+                    "entityType": "device_id",
+                    "description": "登录设备标识"
+                }
+            ]
+        },
+        {
+            "tableName": "user_sensitive_info",
+            "tableNameCn": "用户敏感信息表",
+            "keywords": ["sensitive", "private", "敏感", "隐私"],
+            "category": "敏感数据",
+            "level": 4,
+            "description": "存储用户高度敏感个人信息",
+            "columns": [
+                {
+                    "columnName": "user_id",
+                    "columnNameCn": "用户ID",
+                    "category": "标识信息",
+                    "level": 3,
+                    "entityType": "personal_identifier",
+                    "description": "用户唯一标识符"
+                },
+                {
+                    "columnName": "biometric_data",
+                    "columnNameCn": "生物特征",
+                    "category": "生物信息",
+                    "level": 4,
+                    "entityType": "biometric",
+                    "description": "生物特征数据"
+                },
+                {
+                    "columnName": "health_status",
+                    "columnNameCn": "健康状态",
+                    "category": "健康信息",
+                    "level": 4,
+                    "entityType": "health",
+                    "description": "健康状态信息"
+                },
+                {
+                    "columnName": "religion",
+                    "columnNameCn": "宗教信仰",
+                    "category": "个人信仰",
+                    "level": 4,
+                    "entityType": "religion",
+                    "description": "宗教信仰信息"
+                },
+                {
+                    "columnName": "political_status",
+                    "columnNameCn": "政治面貌",
+                    "category": "政治信息",
+                    "level": 4,
+                    "entityType": "political",
+                    "description": "政治面貌信息"
+                },
+                {
+                    "columnName": "ethnicity",
+                    "columnNameCn": "民族",
+                    "category": "个人信息",
+                    "level": 3,
+                    "entityType": "ethnicity",
+                    "description": "民族信息"
+                }
+            ]
+        },
+        {
+            "tableName": "user_financial_info",
+            "tableNameCn": "用户财务信息表",
+            "keywords": ["financial", "bank", "payment", "财务", "银行", "支付"],
+            "category": "财务数据",
+            "level": 4,
+            "description": "存储用户财务和银行账户信息",
+            "columns": [
+                {
+                    "columnName": "user_id",
+                    "columnNameCn": "用户ID",
+                    "category": "标识信息",
+                    "level": 3,
+                    "entityType": "personal_identifier",
+                    "description": "用户唯一标识符"
+                },
+                {
+                    "columnName": "bank_card_no",
+                    "columnNameCn": "银行卡号",
+                    "category": "账户信息",
+                    "level": 4,
+                    "entityType": "bank_account",
+                    "description": "银行卡号码"
+                },
+                {
+                    "columnName": "bank_name",
+                    "columnNameCn": "开户银行",
+                    "category": "账户信息",
+                    "level": 3,
+                    "entityType": "company_name",
+                    "description": "开户银行名称"
+                },
+                {
+                    "columnName": "account_balance",
+                    "columnNameCn": "账户余额",
+                    "category": "财务信息",
+                    "level": 4,
+                    "entityType": "transaction_amount",
+                    "description": "账户余额"
+                },
+                {
+                    "columnName": "credit_limit",
+                    "columnNameCn": "信用额度",
+                    "category": "财务信息",
+                    "level": 3,
+                    "entityType": "transaction_amount",
+                    "description": "信用额度"
+                },
+                {
+                    "columnName": "bindcard_time",
+                    "columnNameCn": "绑卡时间",
+                    "category": "系统字段",
+                    "level": 1,
+                    "entityType": "datetime",
+                    "description": "银行卡绑定时间"
+                }
+            ]
+        },
+        {
+            "tableName": "company_info",
+            "tableNameCn": "企业基本信息表",
+            "keywords": ["company", "enterprise", "organization", "corp", "企业", "公司", "组织"],
+            "category": "企业数据",
+            "level": 2,
+            "description": "存储企业基本信息",
+            "columns": [
+                {
+                    "columnName": "company_id",
+                    "columnNameCn": "企业ID",
+                    "category": "标识信息",
+                    "level": 2,
+                    "entityType": "company_id",
+                    "description": "企业唯一标识符"
+                },
+                {
+                    "columnName": "company_name",
+                    "columnNameCn": "企业名称",
+                    "category": "基本信息",
+                    "level": 2,
+                    "entityType": "company_name",
+                    "description": "企业全称"
+                },
+                {
+                    "columnName": "short_name",
+                    "columnNameCn": "企业简称",
+                    "category": "基本信息",
+                    "level": 1,
+                    "entityType": "company_name",
+                    "description": "企业简称"
+                },
+                {
+                    "columnName": "business_license",
+                    "columnNameCn": "营业执照号",
+                    "category": "证件信息",
+                    "level": 3,
+                    "entityType": "business_license",
+                    "description": "营业执照号码"
+                },
+                {
+                    "columnName": "unified_social_credit_code",
+                    "columnNameCn": "统一社会信用代码",
+                    "category": "证件信息",
+                    "level": 3,
+                    "entityType": "business_license",
+                    "description": "统一社会信用代码"
+                },
+                {
+                    "columnName": "legal_representative",
+                    "columnNameCn": "法定代表人",
+                    "category": "人员信息",
+                    "level": 3,
+                    "entityType": "legal_representative",
+                    "description": "法定代表人姓名"
+                },
+                {
+                    "columnName": "registered_capital",
+                    "columnNameCn": "注册资本",
+                    "category": "财务信息",
+                    "level": 2,
+                    "entityType": "transaction_amount",
+                    "description": "注册资本金额"
+                },
+                {
+                    "columnName": "industry",
+                    "columnNameCn": "所属行业",
+                    "category": "分类信息",
+                    "level": 1,
+                    "entityType": "category",
+                    "description": "所属行业分类"
+                },
+                {
+                    "columnName": "address",
+                    "columnNameCn": "注册地址",
+                    "category": "联系方式",
+                    "level": 2,
+                    "entityType": "address",
+                    "description": "企业注册地址"
+                },
+                {
+                    "columnName": "contact_phone",
+                    "columnNameCn": "联系电话",
+                    "category": "联系方式",
+                    "level": 2,
+                    "entityType": "phone",
+                    "description": "企业联系电话"
+                },
+                {
+                    "columnName": "contact_email",
+                    "columnNameCn": "联系邮箱",
+                    "category": "联系方式",
+                    "level": 2,
+                    "entityType": "email",
+                    "description": "企业联系邮箱"
+                },
+                {
+                    "columnName": "establish_date",
+                    "columnNameCn": "成立日期",
+                    "category": "基本信息",
+                    "level": 1,
+                    "entityType": "datetime",
+                    "description": "企业成立日期"
+                },
+                {
+                    "columnName": "status",
+                    "columnNameCn": "经营状态",
+                    "category": "基本信息",
+                    "level": 1,
+                    "entityType": "status",
+                    "description": "企业经营状态"
+                }
+            ]
+        },
+        {
+            "tableName": "company_financial_info",
+            "tableNameCn": "企业财务信息表",
+            "keywords": ["company_financial", "enterprise_finance", "企业财务"],
+            "category": "企业财务数据",
+            "level": 3,
+            "description": "存储企业财务信息",
+            "columns": [
+                {
+                    "columnName": "company_id",
+                    "columnNameCn": "企业ID",
+                    "category": "标识信息",
+                    "level": 2,
+                    "entityType": "company_id",
+                    "description": "企业唯一标识符"
+                },
+                {
+                    "columnName": "bank_account",
+                    "columnNameCn": "对公账户",
+                    "category": "账户信息",
+                    "level": 4,
+                    "entityType": "bank_account",
+                    "description": "企业对公银行账户"
+                },
+                {
+                    "columnName": "bank_name",
+                    "columnNameCn": "开户银行",
+                    "category": "账户信息",
+                    "level": 2,
+                    "entityType": "company_name",
+                    "description": "开户银行名称"
+                },
+                {
+                    "columnName": "annual_revenue",
+                    "columnNameCn": "年营收",
+                    "category": "财务信息",
+                    "level": 3,
+                    "entityType": "transaction_amount",
+                    "description": "年度营业收入"
+                },
+                {
+                    "columnName": "total_assets",
+                    "columnNameCn": "总资产",
+                    "category": "财务信息",
+                    "level": 3,
+                    "entityType": "transaction_amount",
+                    "description": "企业总资产"
+                },
+                {
+                    "columnName": "tax_number",
+                    "columnNameCn": "税号",
+                    "category": "税务信息",
+                    "level": 3,
+                    "entityType": "business_license",
+                    "description": "企业税务登记号"
+                }
+            ]
+        },
+        {
+            "tableName": "order_info",
+            "tableNameCn": "订单信息表",
+            "keywords": ["order", "trade", "purchase", "订单", "交易", "采购"],
+            "category": "交易数据",
+            "level": 3,
+            "description": "存储订单交易信息",
+            "columns": [
+                {
+                    "columnName": "order_id",
+                    "columnNameCn": "订单ID",
+                    "category": "标识信息",
+                    "level": 2,
+                    "entityType": "order_id",
+                    "description": "订单唯一标识符"
+                },
+                {
+                    "columnName": "order_no",
+                    "columnNameCn": "订单号",
+                    "category": "标识信息",
+                    "level": 2,
+                    "entityType": "order_id",
+                    "description": "订单编号"
+                },
+                {
+                    "columnName": "user_id",
+                    "columnNameCn": "用户ID",
+                    "category": "关联信息",
+                    "level": 3,
+                    "entityType": "personal_identifier",
+                    "description": "下单用户ID"
+                },
+                {
+                    "columnName": "product_id",
+                    "columnNameCn": "商品ID",
+                    "category": "商品信息",
+                    "level": 1,
+                    "entityType": "product_id",
+                    "description": "商品唯一标识符"
+                },
+                {
+                    "columnName": "product_name",
+                    "columnNameCn": "商品名称",
+                    "category": "商品信息",
+                    "level": 1,
+                    "entityType": "product_name",
+                    "description": "商品名称"
+                },
+                {
+                    "columnName": "quantity",
+                    "columnNameCn": "购买数量",
+                    "category": "订单信息",
+                    "level": 1,
+                    "entityType": "count",
+                    "description": "购买数量"
+                },
+                {
+                    "columnName": "unit_price",
+                    "columnNameCn": "单价",
+                    "category": "价格信息",
+                    "level": 2,
+                    "entityType": "transaction_amount",
+                    "description": "商品单价"
+                },
+                {
+                    "columnName": "total_amount",
+                    "columnNameCn": "总金额",
+                    "category": "价格信息",
+                    "level": 3,
+                    "entityType": "transaction_amount",
+                    "description": "订单总金额"
+                },
+                {
+                    "columnName": "payment_method",
+                    "columnNameCn": "支付方式",
+                    "category": "支付信息",
+                    "level": 2,
+                    "entityType": "category",
+                    "description": "支付方式"
+                },
+                {
+                    "columnName": "payment_status",
+                    "columnNameCn": "支付状态",
+                    "category": "支付信息",
+                    "level": 2,
+                    "entityType": "status",
+                    "description": "支付状态"
+                },
+                {
+                    "columnName": "shipping_address",
+                    "columnNameCn": "收货地址",
+                    "category": "配送信息",
+                    "level": 3,
+                    "entityType": "address",
+                    "description": "收货详细地址"
+                },
+                {
+                    "columnName": "receiver_name",
+                    "columnNameCn": "收货人姓名",
+                    "category": "配送信息",
+                    "level": 3,
+                    "entityType": "name",
+                    "description": "收货人姓名"
+                },
+                {
+                    "columnName": "receiver_phone",
+                    "columnNameCn": "收货人电话",
+                    "category": "配送信息",
+                    "level": 4,
+                    "entityType": "phone",
+                    "description": "收货人联系电话"
+                },
+                {
+                    "columnName": "order_status",
+                    "columnNameCn": "订单状态",
+                    "category": "订单信息",
+                    "level": 1,
+                    "entityType": "status",
+                    "description": "订单状态"
+                },
+                {
+                    "columnName": "order_time",
+                    "columnNameCn": "下单时间",
+                    "category": "时间信息",
+                    "level": 1,
+                    "entityType": "datetime",
+                    "description": "订单创建时间"
+                },
+                {
+                    "columnName": "payment_time",
+                    "columnNameCn": "支付时间",
+                    "category": "时间信息",
+                    "level": 1,
+                    "entityType": "datetime",
+                    "description": "订单支付时间"
+                },
+                {
+                    "columnName": "remark",
+                    "columnNameCn": "备注",
+                    "category": "其他信息",
+                    "level": 1,
+                    "entityType": "description",
+                    "description": "订单备注"
+                }
+            ]
+        },
+        {
+            "tableName": "payment_record",
+            "tableNameCn": "支付记录表",
+            "keywords": ["payment", "pay", "transaction", "支付", "付款"],
+            "category": "支付数据",
+            "level": 4,
+            "description": "存储支付交易记录",
+            "columns": [
+                {
+                    "columnName": "payment_id",
+                    "columnNameCn": "支付ID",
+                    "category": "标识信息",
+                    "level": 2,
+                    "entityType": "order_id",
+                    "description": "支付记录唯一标识"
+                },
+                {
+                    "columnName": "order_id",
+                    "columnNameCn": "订单ID",
+                    "category": "关联信息",
+                    "level": 2,
+                    "entityType": "order_id",
+                    "description": "关联订单ID"
+                },
+                {
+                    "columnName": "user_id",
+                    "columnNameCn": "用户ID",
+                    "category": "关联信息",
+                    "level": 3,
+                    "entityType": "personal_identifier",
+                    "description": "支付用户ID"
+                },
+                {
+                    "columnName": "payment_amount",
+                    "columnNameCn": "支付金额",
+                    "category": "支付信息",
+                    "level": 3,
+                    "entityType": "transaction_amount",
+                    "description": "实际支付金额"
+                },
+                {
+                    "columnName": "payment_channel",
+                    "columnNameCn": "支付渠道",
+                    "category": "支付信息",
+                    "level": 2,
+                    "entityType": "category",
+                    "description": "支付渠道"
+                },
+                {
+                    "columnName": "bank_card_no",
+                    "columnNameCn": "银行卡号",
+                    "category": "账户信息",
+                    "level": 4,
+                    "entityType": "bank_account",
+                    "description": "支付银行卡号"
+                },
+                {
+                    "columnName": "transaction_no",
+                    "columnNameCn": "交易流水号",
+                    "category": "交易信息",
+                    "level": 2,
+                    "entityType": "order_id",
+                    "description": "第三方交易流水号"
+                },
+                {
+                    "columnName": "payment_status",
+                    "columnNameCn": "支付状态",
+                    "category": "支付信息",
+                    "level": 2,
+                    "entityType": "status",
+                    "description": "支付状态"
+                },
+                {
+                    "columnName": "payment_time",
+                    "columnNameCn": "支付时间",
+                    "category": "时间信息",
+                    "level": 1,
+                    "entityType": "datetime",
+                    "description": "支付完成时间"
+                }
+            ]
+        },
+        {
+            "tableName": "product_info",
+            "tableNameCn": "商品信息表",
+            "keywords": ["product", "goods", "item", "commodity", "商品", "产品"],
+            "category": "商品数据",
+            "level": 1,
+            "description": "存储商品基本信息",
+            "columns": [
+                {
+                    "columnName": "product_id",
+                    "columnNameCn": "商品ID",
+                    "category": "标识信息",
+                    "level": 1,
+                    "entityType": "product_id",
+                    "description": "商品唯一标识符"
+                },
+                {
+                    "columnName": "product_name",
+                    "columnNameCn": "商品名称",
+                    "category": "基本信息",
+                    "level": 1,
+                    "entityType": "product_name",
+                    "description": "商品名称"
+                },
+                {
+                    "columnName": "category_id",
+                    "columnNameCn": "分类ID",
+                    "category": "分类信息",
+                    "level": 1,
+                    "entityType": "category",
+                    "description": "商品分类ID"
+                },
+                {
+                    "columnName": "price",
+                    "columnNameCn": "价格",
+                    "category": "价格信息",
+                    "level": 1,
+                    "entityType": "transaction_amount",
+                    "description": "商品价格"
+                },
+                {
+                    "columnName": "stock",
+                    "columnNameCn": "库存",
+                    "category": "库存信息",
+                    "level": 1,
+                    "entityType": "count",
+                    "description": "库存数量"
+                },
+                {
+                    "columnName": "description",
+                    "columnNameCn": "描述",
+                    "category": "基本信息",
+                    "level": 1,
+                    "entityType": "description",
+                    "description": "商品描述"
+                },
+                {
+                    "columnName": "image_url",
+                    "columnNameCn": "图片URL",
+                    "category": "媒体信息",
+                    "level": 1,
+                    "entityType": "url",
+                    "description": "商品图片链接"
+                },
+                {
+                    "columnName": "status",
+                    "columnNameCn": "状态",
+                    "category": "状态信息",
+                    "level": 1,
+                    "entityType": "status",
+                    "description": "商品状态"
+                },
+                {
+                    "columnName": "created_at",
+                    "columnNameCn": "创建时间",
+                    "category": "系统字段",
+                    "level": 1,
+                    "entityType": "datetime",
+                    "description": "创建时间"
+                }
+            ]
+        },
+        {
+            "tableName": "user_behavior_log",
+            "tableNameCn": "用户行为日志表",
+            "keywords": ["behavior", "action", "log", "track", "行为", "日志", "埋点"],
+            "category": "行为数据",
+            "level": 2,
+            "description": "存储用户行为日志数据",
+            "columns": [
+                {
+                    "columnName": "log_id",
+                    "columnNameCn": "日志ID",
+                    "category": "标识信息",
+                    "level": 1,
+                    "entityType": "personal_identifier",
+                    "description": "日志唯一标识"
+                },
+                {
+                    "columnName": "user_id",
+                    "columnNameCn": "用户ID",
+                    "category": "关联信息",
+                    "level": 3,
+                    "entityType": "personal_identifier",
+                    "description": "用户唯一标识"
+                },
+                {
+                    "columnName": "action_type",
+                    "columnNameCn": "行为类型",
+                    "category": "行为信息",
+                    "level": 2,
+                    "entityType": "behavior_log",
+                    "description": "用户行为类型"
+                },
+                {
+                    "columnName": "page_url",
+                    "columnNameCn": "页面URL",
+                    "category": "行为信息",
+                    "level": 1,
+                    "entityType": "url",
+                    "description": "访问页面URL"
+                },
+                {
+                    "columnName": "referrer",
+                    "columnNameCn": "来源页面",
+                    "category": "行为信息",
+                    "level": 1,
+                    "entityType": "url",
+                    "description": "来源页面URL"
+                },
+                {
+                    "columnName": "device_id",
+                    "columnNameCn": "设备ID",
+                    "category": "设备信息",
+                    "level": 2,
+                    "entityType": "device_id",
+                    "description": "设备唯一标识"
+                },
+                {
+                    "columnName": "ip_address",
+                    "columnNameCn": "IP地址",
+                    "category": "网络信息",
+                    "level": 2,
+                    "entityType": "ip_address",
+                    "description": "客户端IP地址"
+                },
+                {
+                    "columnName": "user_agent",
+                    "columnNameCn": "用户代理",
+                    "category": "设备信息",
+                    "level": 1,
+                    "entityType": "description",
+                    "description": "浏览器用户代理"
+                },
+                {
+                    "columnName": "latitude",
+                    "columnNameCn": "纬度",
+                    "category": "位置信息",
+                    "level": 3,
+                    "entityType": "location_track",
+                    "description": "地理位置纬度"
+                },
+                {
+                    "columnName": "longitude",
+                    "columnNameCn": "经度",
+                    "category": "位置信息",
+                    "level": 3,
+                    "entityType": "location_track",
+                    "description": "地理位置经度"
+                },
+                {
+                    "columnName": "event_time",
+                    "columnNameCn": "事件时间",
+                    "category": "时间信息",
+                    "level": 1,
+                    "entityType": "datetime",
+                    "description": "行为发生时间"
+                }
+            ]
+        },
+        {
+            "tableName": "employee_info",
+            "tableNameCn": "员工信息表",
+            "keywords": ["employee", "staff", "worker", "员工", "职员"],
+            "category": "人事数据",
+            "level": 3,
+            "description": "存储员工基本信息",
+            "columns": [
+                {
+                    "columnName": "employee_id",
+                    "columnNameCn": "员工ID",
+                    "category": "标识信息",
+                    "level": 2,
+                    "entityType": "personal_identifier",
+                    "description": "员工唯一标识"
+                },
+                {
+                    "columnName": "name",
+                    "columnNameCn": "姓名",
+                    "category": "身份信息",
+                    "level": 3,
+                    "entityType": "name",
+                    "description": "员工姓名"
+                },
+                {
+                    "columnName": "id_card",
+                    "columnNameCn": "身份证号",
+                    "category": "证件信息",
+                    "level": 4,
+                    "entityType": "id_card",
+                    "description": "身份证号码"
+                },
+                {
+                    "columnName": "phone",
+                    "columnNameCn": "联系电话",
+                    "category": "联系方式",
+                    "level": 4,
+                    "entityType": "phone",
+                    "description": "员工手机号"
+                },
+                {
+                    "columnName": "email",
+                    "columnNameCn": "邮箱",
+                    "category": "联系方式",
+                    "level": 3,
+                    "entityType": "email",
+                    "description": "员工邮箱"
+                },
+                {
+                    "columnName": "department",
+                    "columnNameCn": "部门",
+                    "category": "组织信息",
+                    "level": 2,
+                    "entityType": "work_experience",
+                    "description": "所属部门"
+                },
+                {
+                    "columnName": "position",
+                    "columnNameCn": "职位",
+                    "category": "组织信息",
+                    "level": 2,
+                    "entityType": "work_experience",
+                    "description": "员工职位"
+                },
+                {
+                    "columnName": "salary",
+                    "columnNameCn": "薪资",
+                    "category": "薪酬信息",
+                    "level": 4,
+                    "entityType": "salary",
+                    "description": "员工薪资"
+                },
+                {
+                    "columnName": "bank_card_no",
+                    "columnNameCn": "工资卡号",
+                    "category": "账户信息",
+                    "level": 4,
+                    "entityType": "bank_account",
+                    "description": "工资发放银行卡"
+                },
+                {
+                    "columnName": "entry_date",
+                    "columnNameCn": "入职日期",
+                    "category": "人事信息",
+                    "level": 1,
+                    "entityType": "datetime",
+                    "description": "入职日期"
+                },
+                {
+                    "columnName": "education",
+                    "columnNameCn": "学历",
+                    "category": "教育信息",
+                    "level": 2,
+                    "entityType": "education",
+                    "description": "最高学历"
+                },
+                {
+                    "columnName": "status",
+                    "columnNameCn": "在职状态",
+                    "category": "人事信息",
+                    "level": 1,
+                    "entityType": "status",
+                    "description": "员工在职状态"
+                }
+            ]
+        },
+        {
+            "tableName": "api_access_log",
+            "tableNameCn": "API访问日志表",
+            "keywords": ["api", "access", "request", "接口", "访问"],
+            "category": "系统日志",
+            "level": 2,
+            "description": "存储API访问日志",
+            "columns": [
+                {
+                    "columnName": "request_id",
+                    "columnNameCn": "请求ID",
+                    "category": "标识信息",
+                    "level": 1,
+                    "entityType": "personal_identifier",
+                    "description": "请求唯一标识"
+                },
+                {
+                    "columnName": "api_path",
+                    "columnNameCn": "接口路径",
+                    "category": "请求信息",
+                    "level": 1,
+                    "entityType": "url",
+                    "description": "API接口路径"
+                },
+                {
+                    "columnName": "method",
+                    "columnNameCn": "请求方法",
+                    "category": "请求信息",
+                    "level": 1,
+                    "entityType": "category",
+                    "description": "HTTP请求方法"
+                },
+                {
+                    "columnName": "request_body",
+                    "columnNameCn": "请求体",
+                    "category": "请求信息",
+                    "level": 2,
+                    "entityType": "description",
+                    "description": "请求体内容"
+                },
+                {
+                    "columnName": "response_code",
+                    "columnNameCn": "响应码",
+                    "category": "响应信息",
+                    "level": 1,
+                    "entityType": "status",
+                    "description": "HTTP响应状态码"
+                },
+                {
+                    "columnName": "user_id",
+                    "columnNameCn": "用户ID",
+                    "category": "关联信息",
+                    "level": 3,
+                    "entityType": "personal_identifier",
+                    "description": "请求用户ID"
+                },
+                {
+                    "columnName": "client_ip",
+                    "columnNameCn": "客户端IP",
+                    "category": "网络信息",
+                    "level": 2,
+                    "entityType": "ip_address",
+                    "description": "客户端IP地址"
+                },
+                {
+                    "columnName": "access_token",
+                    "columnNameCn": "访问令牌",
+                    "category": "认证信息",
+                    "level": 4,
+                    "entityType": "token",
+                    "description": "访问令牌"
+                },
+                {
+                    "columnName": "request_time",
+                    "columnNameCn": "请求时间",
+                    "category": "时间信息",
+                    "level": 1,
+                    "entityType": "datetime",
+                    "description": "请求发起时间"
+                },
+                {
+                    "columnName": "duration",
+                    "columnNameCn": "响应时长",
+                    "category": "性能信息",
+                    "level": 1,
+                    "entityType": "count",
+                    "description": "请求处理时长(ms)"
+                }
+            ]
+        }
+    ]
+}
