@@ -134,11 +134,18 @@
             "defaultLevel": 3
         },
         {
+            "type": "system_time",
+            "name": "系统字段",
+            "description": "系统创建、更新、删除等时间戳字段",
+            "keywords": ["created_at", "updated_at", "deleted_at", "create_time", "update_time", "delete_time", "modified_at", "modify_time", "gmt_create", "gmt_modified", "created_time", "updated_time", "创建时间", "更新时间", "修改时间", "删除时间"],
+            "defaultLevel": 1
+        },
+        {
             "type": "datetime",
             "name": "时间日期",
-            "description": "时间或日期信息",
-            "keywords": ["date", "time", "datetime", "timestamp", "created_at", "updated_at", "birth", "birthday", "日期", "时间"],
-            "defaultLevel": 1
+            "description": "一般时间或日期信息",
+            "keywords": ["date", "time", "datetime", "timestamp", "birth", "birthday", "expire", "start_time", "end_time", "begin_time", "日期", "时间", "生日", "出生日期", "到期", "过期"],
+            "defaultLevel": 2
         },
         {
             "type": "age",
@@ -276,8 +283,8 @@
         {
             "type": "status",
             "name": "状态",
-            "description": "状态标识",
-            "keywords": ["status", "state", "flag", "状态"],
+            "description": "状态标识或布尔开关字段",
+            "keywords": ["status", "state", "flag", "is_active", "is_deleted", "is_enabled", "is_valid", "is_locked", "is_verified", "is_default", "is_visible", "is_published", "enabled", "disabled", "active", "deleted", "valid", "invalid", "状态", "是否激活", "是否删除", "是否有效"],
             "defaultLevel": 1
         },
         {
