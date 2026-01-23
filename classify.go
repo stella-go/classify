@@ -15,6 +15,9 @@ package classify
 
 import (
 	"encoding/json"
+	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"unicode"
@@ -190,6 +193,7 @@ type Column struct {
 	Name        string // 列名
 	Description string // 列描述
 	DataType    string // 数据类型
+	SampleData  []any  // 样例数据（可选，支持字符串、数值等类型，用于辅助识别实体类型）
 }
 
 // Result 分类分级结果
@@ -213,13 +217,15 @@ type TableClassificationResult struct {
 
 // ColumnClassificationResult 列分类结果
 type ColumnClassificationResult struct {
-	Category    string  // 分类
-	Level       int     // 敏感级别 1-4
-	LevelName   string  // 级别名称
-	EntityType  string  // 识别的实体类型
-	Description string  // 描述
-	Confidence  float64 // 置信度 0-1
-	IsExact     bool    // 是否精确匹配
+	Category         string  // 分类
+	Level            int     // 敏感级别 1-4
+	LevelName        string  // 级别名称
+	EntityType       string  // 识别的实体类型
+	Description      string  // 描述
+	Confidence       float64 // 置信度 0-1
+	IsExact          bool    // 是否精确匹配
+	SampleEntityType string  // 通过样例数据识别的实体类型（如果有）
+	SampleConfidence float64 // 样例数据识别的置信度
 }
 
 // ==================== 分类分级核心逻辑 ====================
@@ -396,17 +402,29 @@ func (cl *Classifier) matchTable(input *Table) (*tableIndex, float64) {
 func (cl *Classifier) classifyColumn(col Column, columnIndex map[string]*ColumnConfig, matchedTable *TableConfig) *ColumnClassificationResult {
 	colNameLower := strings.ToLower(col.Name)
 
+	// 预先通过样例数据识别实体类型
+	var sampleEntityType string
+	var sampleConfidence float64
+	if len(col.SampleData) > 0 {
+		sampleEntityType, sampleConfidence = cl.identifyEntityBySample(col.SampleData)
+	}
+
 	// Step 1: 尝试精确匹配
 	if configCol, exists := columnIndex[colNameLower]; exists {
-		return &ColumnClassificationResult{
-			Category:    configCol.Category,
-			Level:       configCol.Level,
-			LevelName:   cl.getLevelName(configCol.Level),
-			EntityType:  configCol.EntityType,
-			Description: configCol.Description,
-			Confidence:  1.0,
-			IsExact:     true,
+		result := &ColumnClassificationResult{
+			Category:         configCol.Category,
+			Level:            configCol.Level,
+			LevelName:        cl.getLevelName(configCol.Level),
+			EntityType:       configCol.EntityType,
+			Description:      configCol.Description,
+			Confidence:       1.0,
+			IsExact:          true,
+			SampleEntityType: sampleEntityType,
+			SampleConfidence: sampleConfidence,
 		}
+		// 如果样例数据识别的实体类型与配置不一致，可能需要警告
+		// 这里暂时只记录，不改变分类结果
+		return result
 	}
 
 	// Step 2: 尝试模糊匹配列名
@@ -415,44 +433,50 @@ func (cl *Classifier) classifyColumn(col Column, columnIndex map[string]*ColumnC
 		// 输入列名包含标准列名：如 user_name_cn 包含 user_name
 		if len(configColName) >= 3 && strings.Contains(colNameLower, configColName) {
 			return &ColumnClassificationResult{
-				Category:    configCol.Category,
-				Level:       configCol.Level,
-				LevelName:   cl.getLevelName(configCol.Level),
-				EntityType:  configCol.EntityType,
-				Description: configCol.Description,
-				Confidence:  0.8,
-				IsExact:     false,
+				Category:         configCol.Category,
+				Level:            configCol.Level,
+				LevelName:        cl.getLevelName(configCol.Level),
+				EntityType:       configCol.EntityType,
+				Description:      configCol.Description,
+				Confidence:       0.8,
+				IsExact:          false,
+				SampleEntityType: sampleEntityType,
+				SampleConfidence: sampleConfidence,
 			}
 		}
 		// 标准列名包含输入列名：仅当输入列名足够长（>=4字符）时才匹配
 		// 避免 id 匹配到 id_card 这种情况
 		if len(colNameLower) >= 4 && strings.Contains(configColName, colNameLower) {
 			return &ColumnClassificationResult{
-				Category:    configCol.Category,
-				Level:       configCol.Level,
-				LevelName:   cl.getLevelName(configCol.Level),
-				EntityType:  configCol.EntityType,
-				Description: configCol.Description,
-				Confidence:  0.8,
-				IsExact:     false,
+				Category:         configCol.Category,
+				Level:            configCol.Level,
+				LevelName:        cl.getLevelName(configCol.Level),
+				EntityType:       configCol.EntityType,
+				Description:      configCol.Description,
+				Confidence:       0.8,
+				IsExact:          false,
+				SampleEntityType: sampleEntityType,
+				SampleConfidence: sampleConfidence,
 			}
 		}
 	}
 
-	// Step 3: 通过实体类型识别进行语义匹配
+	// Step 3: 通过实体类型识别进行语义匹配（基于列名、描述，样例数据作为最低优先级）
 	entityType := cl.identifyEntityType(col)
 	if entityType != "" {
 		// 查找标准表中相同实体类型的列
 		for _, configCol := range columnIndex {
 			if configCol.EntityType == entityType {
 				return &ColumnClassificationResult{
-					Category:    configCol.Category,
-					Level:       configCol.Level,
-					LevelName:   cl.getLevelName(configCol.Level),
-					EntityType:  entityType,
-					Description: col.Description,
-					Confidence:  0.6,
-					IsExact:     false,
+					Category:         configCol.Category,
+					Level:            configCol.Level,
+					LevelName:        cl.getLevelName(configCol.Level),
+					EntityType:       entityType,
+					Description:      col.Description,
+					Confidence:       0.6,
+					IsExact:          false,
+					SampleEntityType: sampleEntityType,
+					SampleConfidence: sampleConfidence,
 				}
 			}
 		}
@@ -460,26 +484,30 @@ func (cl *Classifier) classifyColumn(col Column, columnIndex map[string]*ColumnC
 		// 如果标准表中没有相同实体类型，使用实体默认级别
 		if entity, exists := cl.entityMap[entityType]; exists {
 			return &ColumnClassificationResult{
-				Category:    entity.Name,
-				Level:       entity.DefaultLevel,
-				LevelName:   cl.getLevelName(entity.DefaultLevel),
-				EntityType:  entityType,
-				Description: entity.Description,
-				Confidence:  0.4,
-				IsExact:     false,
+				Category:         entity.Name,
+				Level:            entity.DefaultLevel,
+				LevelName:        cl.getLevelName(entity.DefaultLevel),
+				EntityType:       entityType,
+				Description:      entity.Description,
+				Confidence:       0.4,
+				IsExact:          false,
+				SampleEntityType: sampleEntityType,
+				SampleConfidence: sampleConfidence,
 			}
 		}
 	}
 
-	// Step 4: 无法识别，返回默认低级别
+	// Step 5: 无法识别，返回默认低级别
 	return &ColumnClassificationResult{
-		Category:    "未分类",
-		Level:       1,
-		LevelName:   cl.getLevelName(1),
-		EntityType:  "unknown",
-		Description: "无法识别的列",
-		Confidence:  0.1,
-		IsExact:     false,
+		Category:         "未分类",
+		Level:            1,
+		LevelName:        cl.getLevelName(1),
+		EntityType:       "unknown",
+		Description:      "无法识别的列",
+		Confidence:       0.1,
+		IsExact:          false,
+		SampleEntityType: sampleEntityType,
+		SampleConfidence: sampleConfidence,
 	}
 }
 
@@ -492,19 +520,20 @@ func (cl *Classifier) classifyColumn(col Column, columnIndex map[string]*ColumnC
 // 4. 列名中相邻词组合匹配关键词（如 bank_account_no 中的 bank_account）
 // 5. 描述中精确匹配关键词（按词边界）
 // 6. 分词后的单词精确匹配实体关键词
+// 7. 样例数据分析：通过样例数据格式识别实体类型（最低优先级）
 func (cl *Classifier) identifyEntityType(col Column) string {
 	// 将列名分词并转小写
 	colNameLower := strings.ToLower(col.Name)
 	colDescLower := strings.ToLower(col.Description)
 	colTypeLower := strings.ToLower(col.DataType)
 
-	// Step 0: 对于通用名称（如 id），综合描述和数据类型判断
+	// Step 1: 对于通用名称（如 id），综合描述和数据类型判断
 	// 避免把表主键误判为 personal_identifier
 	if entityType := cl.identifyByContext(colNameLower, colDescLower, colTypeLower); entityType != "" {
 		return entityType
 	}
 
-	// Step 1: 尝试完整列名精确匹配
+	// Step 2: 尝试完整列名精确匹配
 	if entityType, exists := cl.keywordToEntity[colNameLower]; exists {
 		return entityType
 	}
@@ -552,6 +581,13 @@ func (cl *Classifier) identifyEntityType(col Column) string {
 					return entity.Type
 				}
 			}
+		}
+	}
+
+	// Step 6: 通过样例数据识别实体类型（最低优先级）
+	if len(col.SampleData) > 0 {
+		if sampleEntityType, confidence := cl.identifyEntityBySample(col.SampleData); sampleEntityType != "" && confidence >= 0.6 {
+			return sampleEntityType
 		}
 	}
 
@@ -686,6 +722,211 @@ func (cl *Classifier) splitCamelCase(s string) []string {
 	}
 
 	return words
+}
+
+// ==================== 样例数据分析 ====================
+
+// samplePattern 样例数据模式定义
+type samplePattern struct {
+	entityType string
+	pattern    *regexp.Regexp
+	validator  func(string) bool // 可选的额外验证函数
+}
+
+// 预编译的正则表达式模式
+var samplePatterns = []samplePattern{
+	// 手机号：1开头的11位数字
+	{entityType: "phone", pattern: regexp.MustCompile(`^1[3-9]\d{9}$`)},
+	// 固定电话：区号-号码格式
+	{entityType: "phone", pattern: regexp.MustCompile(`^0\d{2,3}-?\d{7,8}$`)},
+	// 身份证号：18位，最后一位可能是X
+	{entityType: "id_card", pattern: regexp.MustCompile(`^\d{17}[\dXx]$`), validator: validateIDCard},
+	// 15位老身份证
+	{entityType: "id_card", pattern: regexp.MustCompile(`^\d{15}$`)},
+	// 邮箱
+	{entityType: "email", pattern: regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)},
+	// 银行卡号：16-19位数字
+	{entityType: "bank_account", pattern: regexp.MustCompile(`^\d{16,19}$`)},
+	// IP地址（IPv4）
+	{entityType: "ip_address", pattern: regexp.MustCompile(`^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$`)},
+	// MAC地址
+	{entityType: "mac_address", pattern: regexp.MustCompile(`^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$`)},
+	// 车牌号（中国大陆）- 使用 Unicode 范围 \p{Han} 匹配汉字
+	{entityType: "license_plate", pattern: regexp.MustCompile(`^\p{Han}[A-Z][A-Z0-9]{5,6}$`)},
+	// 邮政编码（中国）
+	{entityType: "postal_code", pattern: regexp.MustCompile(`^\d{6}$`)},
+	// 护照号（中国）
+	{entityType: "passport", pattern: regexp.MustCompile(`^[EeKkGgDdSsPpHh]\d{8}$`)},
+	// 军官证 - 使用 \p{Han} 匹配汉字
+	{entityType: "military_id", pattern: regexp.MustCompile(`^\p{Han}{1,2}\d{7,8}$`)},
+	// 社会统一信用代码
+	{entityType: "unified_social_credit_code", pattern: regexp.MustCompile(`^[0-9A-Z]{18}$`)},
+	// 日期格式 YYYY-MM-DD
+	{entityType: "date", pattern: regexp.MustCompile(`^\d{4}[-/]\d{2}[-/]\d{2}$`)},
+	// 日期时间格式
+	{entityType: "datetime", pattern: regexp.MustCompile(`^\d{4}[-/]\d{2}[-/]\d{2}[\sT]\d{2}:\d{2}(:\d{2})?`)},
+	// 时间格式 HH:MM:SS
+	{entityType: "time", pattern: regexp.MustCompile(`^\d{2}:\d{2}(:\d{2})?$`)},
+	// URL
+	{entityType: "url", pattern: regexp.MustCompile(`^https?://[^\s]+$`)},
+	// 中文姓名（2-4个汉字）- 使用 \p{Han} 匹配汉字
+	{entityType: "name", pattern: regexp.MustCompile(`^\p{Han}{2,4}$`), validator: validateChineseName},
+	// 经纬度
+	{entityType: "coordinate", pattern: regexp.MustCompile(`^-?\d{1,3}\.\d+,\s*-?\d{1,3}\.\d+$`)},
+	// 金额（带小数点和可选货币符号）
+	{entityType: "amount", pattern: regexp.MustCompile(`^[¥$€£]?\d{1,3}(,\d{3})*(\.\d{1,2})?$`)},
+}
+
+// identifyEntityBySample 通过样例数据识别实体类型
+// 返回识别的实体类型和置信度
+func (cl *Classifier) identifyEntityBySample(samples []any) (string, float64) {
+	if len(samples) == 0 {
+		return "", 0
+	}
+
+	// 统计每种实体类型的匹配数量
+	typeMatchCount := make(map[string]int)
+	validSamples := 0
+
+	for _, sampleRaw := range samples {
+		// 将样例数据转换为字符串
+		sample := convertToString(sampleRaw)
+		sample = strings.TrimSpace(sample)
+		if sample == "" || sample == "NULL" || sample == "null" || sample == "nil" || sample == "<nil>" {
+			continue
+		}
+		validSamples++
+
+		for _, sp := range samplePatterns {
+			if sp.pattern.MatchString(sample) {
+				// 如果有额外验证函数，执行验证
+				if sp.validator != nil {
+					if sp.validator(sample) {
+						typeMatchCount[sp.entityType]++
+					}
+				} else {
+					typeMatchCount[sp.entityType]++
+				}
+				break // 每个样例只匹配第一个模式
+			}
+		}
+	}
+
+	if validSamples == 0 {
+		return "", 0
+	}
+
+	// 找出匹配最多的实体类型
+	var bestType string
+	var bestCount int
+	for entityType, count := range typeMatchCount {
+		if count > bestCount {
+			bestCount = count
+			bestType = entityType
+		}
+	}
+
+	if bestType == "" {
+		return "", 0
+	}
+
+	// 计算置信度：匹配数量 / 有效样例数量
+	confidence := float64(bestCount) / float64(validSamples)
+	return bestType, confidence
+}
+
+// validateIDCard 验证身份证号码校验位
+func validateIDCard(id string) bool {
+	if len(id) != 18 {
+		return false
+	}
+	// 权重因子
+	weights := []int{7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2}
+	// 校验码对照表
+	checkCodes := "10X98765432"
+
+	sum := 0
+	for i := 0; i < 17; i++ {
+		digit := int(id[i] - '0')
+		if digit < 0 || digit > 9 {
+			return false
+		}
+		sum += digit * weights[i]
+	}
+
+	expectedCheck := checkCodes[sum%11]
+	actualCheck := id[17]
+	if actualCheck >= 'a' && actualCheck <= 'z' {
+		actualCheck -= 32 // 转大写
+	}
+
+	return expectedCheck == actualCheck
+}
+
+// validateChineseName 验证中文姓名
+// 排除一些明显不是姓名的中文字符串
+func validateChineseName(name string) bool {
+	// 常见的非姓名词汇
+	nonNameWords := []string{
+		"有限", "公司", "集团", "银行", "医院", "学校", "大学", "中心",
+		"部门", "科技", "网络", "信息", "管理", "服务", "投资", "发展",
+		"北京", "上海", "广州", "深圳", "杭州", "成都", "武汉", "西安",
+	}
+	for _, word := range nonNameWords {
+		if strings.Contains(name, word) {
+			return false
+		}
+	}
+	return true
+}
+
+// convertToString 将任意类型转换为字符串
+// 支持常见的数据库字段类型
+func convertToString(v any) string {
+	if v == nil {
+		return ""
+	}
+	switch val := v.(type) {
+	case string:
+		return val
+	case []byte:
+		return string(val)
+	case int:
+		return strconv.Itoa(val)
+	case int8:
+		return strconv.FormatInt(int64(val), 10)
+	case int16:
+		return strconv.FormatInt(int64(val), 10)
+	case int32:
+		return strconv.FormatInt(int64(val), 10)
+	case int64:
+		return strconv.FormatInt(val, 10)
+	case uint:
+		return strconv.FormatUint(uint64(val), 10)
+	case uint8:
+		return strconv.FormatUint(uint64(val), 10)
+	case uint16:
+		return strconv.FormatUint(uint64(val), 10)
+	case uint32:
+		return strconv.FormatUint(uint64(val), 10)
+	case uint64:
+		return strconv.FormatUint(val, 10)
+	case float32:
+		return strconv.FormatFloat(float64(val), 'f', -1, 32)
+	case float64:
+		return strconv.FormatFloat(val, 'f', -1, 64)
+	case bool:
+		return strconv.FormatBool(val)
+	default:
+		// 尝试使用 fmt.Sprint 作为最后手段
+		return fmt.Sprint(v)
+	}
+}
+
+// IdentifyEntityBySampleData 公开的样例数据识别接口
+// 可用于单独分析样例数据的实体类型
+func (cl *Classifier) IdentifyEntityBySampleData(samples []any) (entityType string, confidence float64) {
+	return cl.identifyEntityBySample(samples)
 }
 
 // getLevelName 获取级别名称（使用缓存）

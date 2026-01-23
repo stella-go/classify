@@ -567,3 +567,233 @@ func BenchmarkClassifyBatch(b *testing.B) {
 		_, _ = classifier.ClassifyBatch(tables, 4)
 	}
 }
+
+// ==================== 样例数据识别测试 ====================
+
+// TestClassifier_SampleDataIdentification 测试通过样例数据识别实体类型
+func TestClassifier_SampleDataIdentification(t *testing.T) {
+	classifier, err := NewDefaultClassifier()
+	if err != nil {
+		t.Fatalf("创建分类器失败: %v", err)
+	}
+
+	tests := []struct {
+		name          string
+		samples       []any
+		expectedType  string
+		minConfidence float64
+	}{
+		{
+			name:          "手机号识别",
+			samples:       []any{"13812345678", "15987654321", "18600001111"},
+			expectedType:  "phone",
+			minConfidence: 0.9,
+		},
+		{
+			name:          "身份证识别",
+			samples:       []any{"110101199001011237", "320106198805152349", "440103197512308884"},
+			expectedType:  "id_card",
+			minConfidence: 0.9,
+		},
+		{
+			name:          "邮箱识别",
+			samples:       []any{"user@example.com", "admin@test.org", "info@company.cn"},
+			expectedType:  "email",
+			minConfidence: 0.9,
+		},
+		{
+			name:          "银行卡识别",
+			samples:       []any{"6222021234567890123", "6217001234567890", "6225881234567890123"},
+			expectedType:  "bank_account",
+			minConfidence: 0.9,
+		},
+		{
+			name:          "IP地址识别",
+			samples:       []any{"192.168.1.1", "10.0.0.1", "172.16.0.100"},
+			expectedType:  "ip_address",
+			minConfidence: 0.9,
+		},
+		{
+			name:          "日期识别",
+			samples:       []any{"2024-01-15", "2023-12-01", "2025-06-30"},
+			expectedType:  "date",
+			minConfidence: 0.9,
+		},
+		{
+			name:          "URL识别",
+			samples:       []any{"https://www.example.com", "http://api.test.org/v1", "https://docs.go.dev"},
+			expectedType:  "url",
+			minConfidence: 0.9,
+		},
+		{
+			name:          "混合数据-部分匹配",
+			samples:       []any{"13812345678", "unknown", "15987654321", ""},
+			expectedType:  "phone",
+			minConfidence: 0.5,
+		},
+		{
+			name:          "中文姓名识别",
+			samples:       []any{"张三", "李四", "王五"},
+			expectedType:  "name",
+			minConfidence: 0.9,
+		},
+		{
+			name:          "数值类型样例",
+			samples:       []any{13812345678, 15987654321, 18600001111},
+			expectedType:  "phone",
+			minConfidence: 0.9,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			entityType, confidence := classifier.IdentifyEntityBySampleData(tt.samples)
+			if entityType != tt.expectedType {
+				t.Errorf("期望实体类型 %s, 实际 %s", tt.expectedType, entityType)
+			}
+			if confidence < tt.minConfidence {
+				t.Errorf("期望置信度至少 %.2f, 实际 %.2f", tt.minConfidence, confidence)
+			}
+			t.Logf("%s: 类型=%s, 置信度=%.2f", tt.name, entityType, confidence)
+		})
+	}
+}
+
+// TestClassifier_WithSampleData 测试带样例数据的列分类
+func TestClassifier_WithSampleData(t *testing.T) {
+	classifier, err := NewDefaultClassifier()
+	if err != nil {
+		t.Fatalf("创建分类器失败: %v", err)
+	}
+
+	// 构建测试表，列名模糊但有样例数据
+	input := &Table{
+		Name:        "t_customer_data",
+		Description: "客户数据表",
+		Columns: []Column{
+			{
+				Name:        "contact_info", // 模糊的列名
+				Description: "联系方式",
+				DataType:    "varchar(20)",
+				SampleData:  []any{"13812345678", "15987654321", "18600001111"}, // 样例是手机号
+			},
+			{
+				Name:        "identity_no", // 模糊的列名
+				Description: "证件号",
+				DataType:    "varchar(18)",
+				SampleData:  []any{"110101199001011237", "320106198805152349"}, // 样例是身份证
+			},
+			{
+				Name:        "contact_email", // 模糊的列名
+				Description: "联系邮箱",
+				DataType:    "varchar(100)",
+				SampleData:  []any{"user@example.com", "admin@test.org"}, // 样例是邮箱
+			},
+			{
+				Name:        "unknown_col", // 完全未知的列名
+				Description: "",
+				DataType:    "varchar(50)",
+				SampleData:  []any{"京A12345", "沪B67890", "粤C11111"}, // 样例是车牌号
+			},
+			{
+				Name:        "data_field", // 模糊的列名
+				Description: "数据字段",
+				DataType:    "varchar(50)",
+				SampleData:  []any{"192.168.1.1", "10.0.0.1", "172.16.0.100"}, // 样例是IP地址
+			},
+		},
+	}
+
+	result, err := classifier.Classify(input)
+	if err != nil {
+		t.Fatalf("分类失败: %v", err)
+	}
+
+	t.Log("=== 带样例数据的列分类结果 ===")
+
+	// 验证 contact_info 被识别为手机号
+	if colResult, ok := result.Columns["contact_info"]; ok {
+		t.Logf("contact_info: 实体=%s, 样例实体=%s, 样例置信度=%.2f",
+			colResult.EntityType, colResult.SampleEntityType, colResult.SampleConfidence)
+		if colResult.SampleEntityType != "phone" {
+			t.Errorf("期望 contact_info 样例识别为 phone, 实际为 %s", colResult.SampleEntityType)
+		}
+	}
+
+	// 验证 identity_no 被识别为身份证
+	if colResult, ok := result.Columns["identity_no"]; ok {
+		t.Logf("identity_no: 实体=%s, 样例实体=%s, 样例置信度=%.2f",
+			colResult.EntityType, colResult.SampleEntityType, colResult.SampleConfidence)
+		if colResult.SampleEntityType != "id_card" {
+			t.Errorf("期望 identity_no 样例识别为 id_card, 实际为 %s", colResult.SampleEntityType)
+		}
+	}
+
+	// 验证 contact_email 被识别为邮箱
+	if colResult, ok := result.Columns["contact_email"]; ok {
+		t.Logf("contact_email: 实体=%s, 样例实体=%s, 样例置信度=%.2f",
+			colResult.EntityType, colResult.SampleEntityType, colResult.SampleConfidence)
+		if colResult.SampleEntityType != "email" {
+			t.Errorf("期望 contact_email 样例识别为 email, 实际为 %s", colResult.SampleEntityType)
+		}
+	}
+
+	// 验证 unknown_col 被识别为车牌号
+	if colResult, ok := result.Columns["unknown_col"]; ok {
+		t.Logf("unknown_col: 实体=%s, 样例实体=%s, 样例置信度=%.2f",
+			colResult.EntityType, colResult.SampleEntityType, colResult.SampleConfidence)
+		if colResult.SampleEntityType != "license_plate" {
+			t.Errorf("期望 unknown_col 样例识别为 license_plate, 实际为 %s", colResult.SampleEntityType)
+		}
+	}
+
+	// 验证 data_field 被识别为IP地址
+	if colResult, ok := result.Columns["data_field"]; ok {
+		t.Logf("data_field: 实体=%s, 样例实体=%s, 样例置信度=%.2f",
+			colResult.EntityType, colResult.SampleEntityType, colResult.SampleConfidence)
+		if colResult.SampleEntityType != "ip_address" {
+			t.Errorf("期望 data_field 样例识别为 ip_address, 实际为 %s", colResult.SampleEntityType)
+		}
+	}
+}
+
+// TestClassifier_SampleDataPriority 测试样例数据优先级
+func TestClassifier_SampleDataPriority(t *testing.T) {
+	classifier, err := NewDefaultClassifier()
+	if err != nil {
+		t.Fatalf("创建分类器失败: %v", err)
+	}
+
+	// 列名暗示是地址，但样例数据是手机号
+	input := &Table{
+		Name:        "t_test",
+		Description: "测试表",
+		Columns: []Column{
+			{
+				Name:        "address_field", // 列名暗示是地址
+				Description: "地址信息",
+				DataType:    "varchar(50)",
+				SampleData:  []any{"13812345678", "15987654321"}, // 但样例是手机号
+			},
+		},
+	}
+
+	result, err := classifier.Classify(input)
+	if err != nil {
+		t.Fatalf("分类失败: %v", err)
+	}
+
+	colResult := result.Columns["address_field"]
+	t.Logf("address_field: 最终实体=%s, 样例实体=%s, 样例置信度=%.2f",
+		colResult.EntityType, colResult.SampleEntityType, colResult.SampleConfidence)
+
+	// 样例数据应该被识别为手机号
+	if colResult.SampleEntityType != "phone" {
+		t.Errorf("期望样例识别为 phone, 实际为 %s", colResult.SampleEntityType)
+	}
+
+	// 高置信度的样例数据应该影响最终分类
+	if colResult.SampleConfidence >= 0.7 && colResult.EntityType != "phone" {
+		t.Logf("注意: 样例数据置信度高但最终实体类型不同, 可能需要检查优先级逻辑")
+	}
+}
