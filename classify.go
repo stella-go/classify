@@ -21,7 +21,243 @@ import (
 	"strings"
 	"sync"
 	"unicode"
+	"unicode/utf8"
 )
+
+// ==================== 语义匹配相关常量 ====================
+
+// 动词形态映射表 - 将变体映射到原形
+var verbForms = map[string]string{
+	// 时间相关
+	"created": "create", "creation": "create", "creating": "create", "crt": "create",
+	"updated": "update", "upd": "update", "updating": "update",
+	"deleted": "delete", "del": "delete", "deleting": "delete",
+	"modified": "modify", "mod": "modify", "modifying": "modify",
+	"generated": "generate", "gen": "generate",
+	"processed": "process", "proc": "process",
+	"approved": "approve", "rejected": "reject", "confirmed": "confirm",
+	"submitted": "submit", "canceled": "cancel", "cancelled": "cancel",
+	"activated": "activate", "disabled": "disable", "enabled": "enable",
+	"locked": "lock", "unlocked": "unlock", "started": "start", "ended": "end",
+	"finished": "finish", "established": "establish", "completed": "complete",
+	"registered": "register", "reg": "register",
+	"authenticated": "authenticate", "auth": "authenticate",
+	"authorized": "authorize",
+	"validated":  "validate", "verified": "verify",
+	"synced": "sync", "synchronized": "sync",
+	"imported": "import", "exported": "export", "exp": "export",
+	"inserted": "insert", "ins": "insert",
+	"selected": "select", "sel": "select",
+	"calculated": "calculate", "calc": "calculate",
+}
+
+// 同义词组 - 每个组内的词语义等价
+var synonymGroups = [][]string{
+	// 状态/类型
+	{"status", "state", "condition", "situation"},
+	{"type", "kind", "category", "class", "sort"},
+	{"level", "grade", "rank", "tier"},
+	// 时间
+	{"time", "date", "timestamp", "datetime", "at", "when", "moment"},
+	{"create", "establish", "found", "initiate", "start"},
+	{"update", "modify", "change", "alter", "revise"},
+	{"delete", "remove", "erase", "clear", "del"},
+	// 标识
+	{"id", "identifier", "key", "code", "no", "number", "num"},
+	{"name", "title", "label", "caption"},
+	// 描述
+	{"desc", "description", "detail", "info", "information", "note"},
+	// 数量
+	{"count", "num", "number", "quantity", "qty", "amount", "total"},
+	{"price", "cost", "fee", "charge", "rate", "value", "worth"},
+	// 人员
+	{"user", "member", "customer", "client", "consumer", "buyer", "account"},
+	{"admin", "administrator", "manager", "operator"},
+	// 位置
+	{"address", "addr", "location", "place", "site", "position"},
+	{"city", "town", "municipality"},
+	{"province", "state", "region"},
+	// 联系
+	{"phone", "tel", "telephone", "mobile", "cell", "handset"},
+	{"email", "mail", "e-mail", "mailbox"},
+	// 内容
+	{"content", "text", "body", "detail", "context"},
+	{"title", "subject", "topic", "headline", "heading"},
+}
+
+// ==================== 三层语义匹配架构 ====================
+
+// normalizeMorphology 形态归一化层 - 将动词变体映射到原形
+func (cl *Classifier) normalizeMorphology(words []string) []string {
+	result := make([]string, len(words))
+	for i, word := range words {
+		if baseForm, exists := verbForms[word]; exists {
+			result[i] = baseForm
+		} else {
+			result[i] = word
+		}
+	}
+	return result
+}
+
+// expandSynonyms 同义词扩展层 - 将词扩展为其同义词组
+func (cl *Classifier) expandSynonyms(words []string) []string {
+	// 动态上限：原始词数 × 10
+	maxExpandedTokens := len(words) * 10
+	if maxExpandedTokens < 20 {
+		maxExpandedTokens = 20 // 保底
+	}
+
+	seen := make(map[string]bool)
+	var result []string
+
+	for _, word := range words {
+		if seen[word] {
+			continue
+		}
+		seen[word] = true
+		result = append(result, word)
+
+		// 只扩展原始词，不扩展扩展出来的词（防止链式爆炸）
+		for _, group := range synonymGroups {
+			found := false
+			for _, syn := range group {
+				if syn == word {
+					found = true
+					break
+				}
+			}
+			if found {
+				for _, s := range group {
+					if s != word && !seen[s] && len(result) < maxExpandedTokens {
+						seen[s] = true
+						result = append(result, s)
+					}
+				}
+				break
+			}
+		}
+	}
+	return result
+}
+
+// levenshteinDistance 计算两个字符串的编辑距离
+func (cl *Classifier) levenshteinDistance(s1, s2 string) int {
+	m, n := len(s1), len(s2)
+	if m == 0 {
+		return n
+	}
+	if n == 0 {
+		return m
+	}
+
+	// 使用动态规划，只使用两行来节省空间
+	prev := make([]int, n+1)
+	curr := make([]int, n+1)
+
+	// 初始化第一行
+	for j := 0; j <= n; j++ {
+		prev[j] = j
+	}
+
+	for i := 1; i <= m; i++ {
+		curr[0] = i
+		for j := 1; j <= n; j++ {
+			cost := 0
+			if s1[i-1] != s2[j-1] {
+				cost = 1
+			}
+			curr[j] = min(prev[j]+1, // 删除
+				min(curr[j-1]+1, // 插入
+					prev[j-1]+cost)) // 替换
+		}
+		// 交换行
+		prev, curr = curr, prev
+	}
+
+	return prev[n]
+}
+
+// min 返回两个整数中的较小值
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+// abs 返回整数的绝对值
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
+// dynamicThreshold 根据词长计算动态编辑距离阈值
+func (cl *Classifier) dynamicThreshold(length int) int {
+	switch {
+	case length <= 2:
+		return 0 // 必须精确匹配
+	case length <= 4:
+		return 1 // 允许1个误差
+	default:
+		return 2 // 标准阈值
+	}
+}
+
+// fuzzyMatchEntity 使用编辑距离进行模糊匹配
+// 根据列名长度自动选择匹配阈值
+func (cl *Classifier) fuzzyMatchEntity(colName string) (string, float64) {
+	length := utf8.RuneCountInString(strings.ToLower(colName))
+	minScore := 0.8
+	switch length {
+	case 3:
+		minScore = 0.67 // 允许距离1: (3-1)/3 = 0.67
+	case 4:
+		minScore = 0.75 // 允许距离1: (4-1)/4 = 0.75
+	}
+	return cl.fuzzyMatchEntityWithThreshold(colName, minScore)
+}
+
+// fuzzyMatchEntityWithThreshold 带自定义阈值的模糊匹配
+func (cl *Classifier) fuzzyMatchEntityWithThreshold(colName string, minScore float64) (string, float64) {
+	colNameLower := strings.ToLower(colName)
+	length := utf8.RuneCountInString(colNameLower) // 按字符而非字节
+	maxDistance := cl.dynamicThreshold(length)
+
+	if maxDistance == 0 {
+		return "", 0.0
+	}
+
+	bestMatch := ""
+	bestScore := 0.0
+
+	for keyword, entityType := range cl.keywordToEntity {
+		keywordLen := utf8.RuneCountInString(keyword)
+		if abs(keywordLen-length) > maxDistance {
+			continue
+		}
+
+		distance := cl.levenshteinDistance(colNameLower, keyword)
+		if distance > maxDistance {
+			continue
+		}
+
+		maxLen := keywordLen
+		if length > maxLen {
+			maxLen = length
+		}
+		score := 1.0 - float64(distance)/float64(maxLen)
+
+		if score >= minScore && score > bestScore {
+			bestScore = score
+			bestMatch = entityType
+		}
+	}
+
+	return bestMatch, bestScore
+}
 
 // ==================== 配置结构体定义 ====================
 
@@ -511,58 +747,99 @@ func (cl *Classifier) classifyColumn(col Column, columnIndex map[string]*ColumnC
 	}
 }
 
-// identifyEntityType 识别列的实体类型
-// 通过关键词匹配识别列名对应的实体类型
-// 匹配策略（按优先级）：
-// 1. 综合判断：对于通用名称（如id），结合描述和数据类型判断
-// 2. 完整列名精确匹配关键词
-// 3. 列名分词后精确匹配关键词
-// 4. 列名中相邻词组合匹配关键词（如 bank_account_no 中的 bank_account）
-// 5. 描述中精确匹配关键词（按词边界）
-// 6. 分词后的单词精确匹配实体关键词
-// 7. 样例数据分析：通过样例数据格式识别实体类型（最低优先级）
+// identifyEntityType 识别列的实体类型 - 三层语义匹配架构
+// Layer 1: 形态归一化 - 处理动词时态/语态变体
+// Layer 2: 编辑距离（模糊匹配）- 在形态归一化后的词上做模糊匹配
+// Layer 3: 同义词扩展 - 仅用于生成精确匹配候选，降级模糊匹配
+// 最后通过样例数据分析识别实体类型（最低优先级）
 func (cl *Classifier) identifyEntityType(col Column) string {
-	// 将列名分词并转小写
 	colNameLower := strings.ToLower(col.Name)
 	colDescLower := strings.ToLower(col.Description)
 	colTypeLower := strings.ToLower(col.DataType)
 
-	// Step 1: 对于通用名称（如 id），综合描述和数据类型判断
-	// 避免把表主键误判为 personal_identifier
+	// ========== 空值保护 ==========
+	if len(colNameLower) == 0 {
+		return ""
+	}
+
+	// 纯数字保护（纯数字通常不应匹配实体）
+	isAllDigits := true
+	for _, c := range colNameLower {
+		if c < '0' || c > '9' {
+			isAllDigits = false
+			break
+		}
+	}
+	if isAllDigits {
+		return ""
+	}
+
+	// Step 0: 上下文判断（对于通用名称如id，结合描述和数据类型判断）
 	if entityType := cl.identifyByContext(colNameLower, colDescLower, colTypeLower); entityType != "" {
 		return entityType
 	}
 
-	// Step 2: 尝试完整列名精确匹配
+	// Step 1: 精确匹配（原始名称）
 	if entityType, exists := cl.keywordToEntity[colNameLower]; exists {
 		return entityType
 	}
 
-	// Step 2: 分词匹配（按下划线、驼峰分词）
+	// 分词
 	words := cl.splitColumnName(colNameLower)
-	for _, word := range words {
+
+	// ========== Layer 1: 形态归一化 ==========
+	normalizedWords := cl.normalizeMorphology(words)
+	normalizedName := strings.Join(normalizedWords, "_")
+
+	// 标准化后的精确匹配
+	if entityType, exists := cl.keywordToEntity[normalizedName]; exists {
+		return entityType
+	}
+	// 标准化后的分词匹配
+	for _, word := range normalizedWords {
 		if entityType, exists := cl.keywordToEntity[word]; exists {
 			return entityType
 		}
 	}
 
-	// Step 3: 尝试相邻词组合匹配（如 bank_account_no -> bank_account, account_no）
-	// 这解决了 bank_account_no 无法匹配 bank_account 的问题
-	for i := 0; i < len(words)-1; i++ {
-		// 尝试两个相邻词的组合
-		combo := words[i] + "_" + words[i+1]
-		if entityType, exists := cl.keywordToEntity[combo]; exists {
-			return entityType
-		}
-		// 不带下划线的组合
-		comboNoUnderscore := words[i] + words[i+1]
-		if entityType, exists := cl.keywordToEntity[comboNoUnderscore]; exists {
+	// ========== Layer 2: 编辑距离（模糊匹配）==========
+	// 在形态归一化后的词上做模糊匹配
+	if entityType, score := cl.fuzzyMatchEntity(normalizedName); entityType != "" && score >= 0.8 {
+		return entityType
+	}
+	for _, word := range normalizedWords {
+		if entityType, score := cl.fuzzyMatchEntity(word); entityType != "" && score >= 0.8 {
 			return entityType
 		}
 	}
 
-	// Step 4: 在描述中按词边界查找关键词
-	// 将描述分词，避免部分匹配导致的误判
+	// ========== Layer 3: 同义词扩展 ==========
+	expandedWords := cl.expandSynonyms(normalizedWords)
+
+	// 3a: 同义词精确匹配
+	for _, word := range expandedWords {
+		if entityType, exists := cl.keywordToEntity[word]; exists {
+			return entityType
+		}
+	}
+
+	// 3b: 同义词降级模糊匹配（降低阈值到0.65）
+	for _, word := range expandedWords {
+		if entityType, score := cl.fuzzyMatchEntityWithThreshold(word, 0.65); entityType != "" && score >= 0.65 {
+			return entityType
+		}
+		// 相邻词组合
+		for _, other := range expandedWords {
+			if word != other {
+				combo := word + "_" + other
+				if entityType, exists := cl.keywordToEntity[combo]; exists {
+					return entityType
+				}
+			}
+		}
+	}
+
+	// 保留原有的描述匹配逻辑
 	descWords := cl.splitDescriptionToWords(colDescLower)
 	for _, descWord := range descWords {
 		if entityType, exists := cl.keywordToEntity[descWord]; exists {
@@ -570,13 +847,11 @@ func (cl *Classifier) identifyEntityType(col Column) string {
 		}
 	}
 
-	// Step 5: 遍历所有实体的关键词，与分词后的单词进行精确匹配
-	// 注意：这里使用精确匹配而非部分匹配，避免 "page" 匹配到 "age" 的问题
+	// 保留原有的关键词遍历匹配
 	for _, entity := range cl.entityConfig.Entities {
 		for _, keyword := range entity.Keywords {
 			keywordLower := strings.ToLower(keyword)
-			// 检查分词后的单词是否与关键词完全匹配
-			for _, word := range words {
+			for _, word := range normalizedWords {
 				if word == keywordLower {
 					return entity.Type
 				}
@@ -699,7 +974,17 @@ func (cl *Classifier) splitColumnName(name string) []string {
 		result = append(result, words...)
 	}
 
-	return result
+	// 去重
+	seen := make(map[string]bool)
+	var uniqueWords []string
+	for _, w := range result {
+		if !seen[w] {
+			seen[w] = true
+			uniqueWords = append(uniqueWords, w)
+		}
+	}
+
+	return uniqueWords
 }
 
 // splitCamelCase 分割驼峰命名

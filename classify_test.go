@@ -16,22 +16,22 @@ package classify
 import (
 	"encoding/json"
 	"testing"
+	"unicode/utf8"
 )
 
-// loadConfigs 使用内置默认配置
-func loadConfigs(t *testing.T) (string, string) {
-	// 使用 embed 嵌入的默认配置
-	return DefaultConfig, DefaultEntity
+// newTestClassifier 创建测试用分类器实例
+func newTestClassifier(t testing.TB) *Classifier {
+	t.Helper()
+	classifier, err := NewClassifier(DefaultConfig, DefaultEntity)
+	if err != nil {
+		t.Fatalf("创建分类器失败: %v", err)
+	}
+	return classifier
 }
 
 // TestClassifier_UserInfoTable 测试用户信息表分类
 func TestClassifier_UserInfoTable(t *testing.T) {
-	configData, entityData := loadConfigs(t)
-
-	classifier, err := NewClassifier(configData, entityData)
-	if err != nil {
-		t.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(t)
 
 	// 构建用户信息表输入
 	input := &Table{
@@ -92,12 +92,7 @@ func TestClassifier_UserInfoTable(t *testing.T) {
 
 // TestClassifier_CompanyInfoTable 测试企业信息表分类
 func TestClassifier_CompanyInfoTable(t *testing.T) {
-	configData, entityData := loadConfigs(t)
-
-	classifier, err := NewClassifier(configData, entityData)
-	if err != nil {
-		t.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(t)
 
 	// 构建企业信息表输入
 	input := &Table{
@@ -147,12 +142,7 @@ func TestClassifier_CompanyInfoTable(t *testing.T) {
 
 // TestClassifier_OrderInfoTable 测试交易信息表分类
 func TestClassifier_OrderInfoTable(t *testing.T) {
-	configData, entityData := loadConfigs(t)
-
-	classifier, err := NewClassifier(configData, entityData)
-	if err != nil {
-		t.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(t)
 
 	// 构建订单信息表输入
 	input := &Table{
@@ -215,12 +205,7 @@ func TestClassifier_OrderInfoTable(t *testing.T) {
 
 // TestClassifier_PaymentRecordTable 测试支付记录表分类
 func TestClassifier_PaymentRecordTable(t *testing.T) {
-	configData, entityData := loadConfigs(t)
-
-	classifier, err := NewClassifier(configData, entityData)
-	if err != nil {
-		t.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(t)
 
 	// 构建支付记录表输入
 	input := &Table{
@@ -266,12 +251,7 @@ func TestClassifier_PaymentRecordTable(t *testing.T) {
 
 // TestClassifier_EmployeeInfoTable 测试员工信息表分类
 func TestClassifier_EmployeeInfoTable(t *testing.T) {
-	configData, entityData := loadConfigs(t)
-
-	classifier, err := NewClassifier(configData, entityData)
-	if err != nil {
-		t.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(t)
 
 	// 构建员工信息表输入
 	input := &Table{
@@ -323,12 +303,7 @@ func TestClassifier_EmployeeInfoTable(t *testing.T) {
 
 // TestClassifier_BehaviorLogTable 测试用户行为日志表分类
 func TestClassifier_BehaviorLogTable(t *testing.T) {
-	configData, entityData := loadConfigs(t)
-
-	classifier, err := NewClassifier(configData, entityData)
-	if err != nil {
-		t.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(t)
 
 	// 构建用户行为日志表输入
 	input := &Table{
@@ -379,12 +354,7 @@ func TestClassifier_BehaviorLogTable(t *testing.T) {
 
 // TestClassifier_ResultJSON 测试结果JSON序列化
 func TestClassifier_ResultJSON(t *testing.T) {
-	configData, entityData := loadConfigs(t)
-
-	classifier, err := NewClassifier(configData, entityData)
-	if err != nil {
-		t.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(t)
 
 	input := &Table{
 		Name:        "user_basic_info",
@@ -412,12 +382,7 @@ func TestClassifier_ResultJSON(t *testing.T) {
 
 // TestClassifier_GetCategories 测试获取分类列表
 func TestClassifier_GetCategories(t *testing.T) {
-	configData, entityData := loadConfigs(t)
-
-	classifier, err := NewClassifier(configData, entityData)
-	if err != nil {
-		t.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(t)
 
 	categories := classifier.GetTableCategories()
 	t.Logf("所有表分类: %v", categories)
@@ -429,12 +394,7 @@ func TestClassifier_GetCategories(t *testing.T) {
 
 // TestClassifier_GetEntityTypes 测试获取实体类型列表
 func TestClassifier_GetEntityTypes(t *testing.T) {
-	configData, entityData := loadConfigs(t)
-
-	classifier, err := NewClassifier(configData, entityData)
-	if err != nil {
-		t.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(t)
 
 	entityTypes := classifier.GetEntityTypes()
 	t.Logf("所有实体类型: %v", entityTypes)
@@ -446,12 +406,7 @@ func TestClassifier_GetEntityTypes(t *testing.T) {
 
 // TestClassifier_ClassifyBatch 测试批量分类
 func TestClassifier_ClassifyBatch(t *testing.T) {
-	configData, entityData := loadConfigs(t)
-
-	classifier, err := NewClassifier(configData, entityData)
-	if err != nil {
-		t.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(t)
 
 	// 构建多个测试表
 	tables := []*Table{
@@ -511,12 +466,7 @@ func TestClassifier_ClassifyBatch(t *testing.T) {
 
 // BenchmarkClassify 性能基准测试
 func BenchmarkClassify(b *testing.B) {
-	configData, entityData := DefaultConfig, DefaultEntity
-
-	classifier, err := NewClassifier(configData, entityData)
-	if err != nil {
-		b.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(b)
 
 	input := &Table{
 		Name:        "t_user_info",
@@ -540,12 +490,7 @@ func BenchmarkClassify(b *testing.B) {
 
 // BenchmarkClassifyBatch 批量处理性能基准测试
 func BenchmarkClassifyBatch(b *testing.B) {
-	configData, entityData := DefaultConfig, DefaultEntity
-
-	classifier, err := NewClassifier(configData, entityData)
-	if err != nil {
-		b.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(b)
 
 	// 创建100个测试表
 	tables := make([]*Table, 100)
@@ -572,10 +517,7 @@ func BenchmarkClassifyBatch(b *testing.B) {
 
 // TestClassifier_SampleDataIdentification 测试通过样例数据识别实体类型
 func TestClassifier_SampleDataIdentification(t *testing.T) {
-	classifier, err := NewDefaultClassifier()
-	if err != nil {
-		t.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(t)
 
 	tests := []struct {
 		name          string
@@ -661,10 +603,7 @@ func TestClassifier_SampleDataIdentification(t *testing.T) {
 
 // TestClassifier_WithSampleData 测试带样例数据的列分类
 func TestClassifier_WithSampleData(t *testing.T) {
-	classifier, err := NewDefaultClassifier()
-	if err != nil {
-		t.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(t)
 
 	// 构建测试表，列名模糊但有样例数据
 	input := &Table{
@@ -757,12 +696,176 @@ func TestClassifier_WithSampleData(t *testing.T) {
 	}
 }
 
+// TestSemanticMatching 测试三层语义匹配架构
+func TestSemanticMatching(t *testing.T) {
+	classifier := newTestClassifier(t)
+
+	testCases := []struct {
+		colName         string
+		shouldRecognize bool // 是否至少应该识别到某个类型
+	}{
+		// 形态变体
+		{"create_date", true},
+		{"created_date", true},
+		{"creation_date", true},
+		{"upd_time", true},
+		{"updated_time", true},
+		{"del_flag", true},
+		{"deleted_flag", true},
+
+		// 同义变体
+		{"user_state", true},
+		{"item_kind", true},
+		{"record_when", true},
+		{"established_at", true},
+	}
+
+	matched := 0
+	for _, tc := range testCases {
+		col := Column{Name: tc.colName, Description: "", DataType: "varchar"}
+		entityType := classifier.identifyEntityType(col)
+
+		if tc.shouldRecognize {
+			if entityType != "" && entityType != "unknown" {
+				matched++
+				t.Logf("✓ %s -> %s", tc.colName, entityType)
+			} else {
+				t.Logf("✗ %s -> 未识别", tc.colName)
+			}
+		}
+	}
+
+	accuracy := float64(matched) / float64(len(testCases))
+	t.Logf("准确率: %.2f%% (%d/%d)", accuracy*100, matched, len(testCases))
+
+	if accuracy < 0.85 {
+		t.Errorf("准确率 %.2f%% 低于 85%%", accuracy*100)
+	}
+}
+
+// TestShortWordMismatchProtection 测试短词误匹配保护
+func TestShortWordMismatchProtection(t *testing.T) {
+	classifier := newTestClassifier(t)
+
+	testCases := []struct {
+		colName        string
+		shouldMatch    bool // 是否应该匹配到某个实体
+		expectedEntity string
+	}{
+		// 纯数字不应该匹配（空值保护）
+		{"123", false, ""},
+		{"1234", false, ""},
+		{"999999", false, ""},
+
+		// 空字符串
+		{"", false, ""},
+
+		// 3字符无意义词不应该匹配（3字符阈值0.85阻挡模糊匹配）
+		{"abc", false, ""},
+		{"xyz", false, ""},
+		{"qwe", false, ""},
+	}
+
+	passCount := 0
+	for _, tc := range testCases {
+		col := Column{Name: tc.colName, Description: "", DataType: "varchar"}
+		entityType := classifier.identifyEntityType(col)
+
+		if tc.shouldMatch {
+			if entityType != "" {
+				if tc.expectedEntity == "" || entityType == tc.expectedEntity {
+					passCount++
+					t.Logf("✓ %s -> %s", tc.colName, entityType)
+				} else {
+					t.Logf("✗ %s 期望 %s，实际 %s", tc.colName, tc.expectedEntity, entityType)
+				}
+			} else {
+				t.Logf("✗ %s 应该匹配，但未匹配", tc.colName)
+			}
+		} else {
+			if entityType == "" {
+				passCount++
+				t.Logf("✓ %s -> 未匹配 (符合预期)", tc.colName)
+			} else {
+				t.Logf("⚠ %s -> %s (可能误匹配)", tc.colName, entityType)
+			}
+		}
+	}
+
+	t.Logf("通过率: %d/%d", passCount, len(testCases))
+}
+
+// TestSynonymDegradedMatching 测试同义词降级模糊匹配
+func TestSynonymDegradedMatching(t *testing.T) {
+	classifier := newTestClassifier(t)
+
+	testCases := []struct {
+		colName         string
+		shouldRecognize bool
+	}{
+		// 同义词精确匹配
+		{"user_status", true},
+		{"item_type", true},
+		{"record_time", true},
+
+		// 同义词降级模糊匹配（阈值0.7）
+		// "state" 是 "status" 的同义词
+		{"order_state", true},
+		{"account_state", true},
+
+		// "kind" 是 "type" 的同义词
+		{"product_kind", true},
+
+		// "when" 是 "time" 的同义词
+		{"created_when", true},
+	}
+
+	matched := 0
+	for _, tc := range testCases {
+		col := Column{Name: tc.colName, Description: "", DataType: "varchar"}
+		entityType := classifier.identifyEntityType(col)
+
+		if tc.shouldRecognize {
+			if entityType != "" && entityType != "unknown" {
+				matched++
+				t.Logf("✓ %s -> %s", tc.colName, entityType)
+			} else {
+				t.Logf("✗ %s -> 未识别", tc.colName)
+			}
+		}
+	}
+
+	accuracy := float64(matched) / float64(len(testCases))
+	t.Logf("同义词匹配准确率: %.2f%% (%d/%d)", accuracy*100, matched, len(testCases))
+
+	if accuracy < 0.70 {
+		t.Errorf("同义词匹配准确率 %.2f%% 低于 70%%", accuracy*100)
+	}
+}
+
+// TestUnicodeLength 测试Unicode字符长度计算
+func TestUnicodeLength(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected int
+	}{
+		{"abc", 3},  // ASCII
+		{"用户", 2},   // 中文
+		{"🎉", 1},    // Emoji
+		{"用户id", 4}, // 混合
+	}
+
+	for _, tc := range testCases {
+		actual := utf8.RuneCountInString(tc.input)
+		if actual != tc.expected {
+			t.Errorf("%s: 期望 %d, 实际 %d", tc.input, tc.expected, actual)
+		}
+	}
+}
+
 // TestClassifier_SampleDataPriority 测试样例数据优先级
 func TestClassifier_SampleDataPriority(t *testing.T) {
-	classifier, err := NewDefaultClassifier()
-	if err != nil {
-		t.Fatalf("创建分类器失败: %v", err)
-	}
+	classifier := newTestClassifier(t)
 
 	// 列名暗示是地址，但样例数据是手机号
 	input := &Table{
@@ -795,5 +898,83 @@ func TestClassifier_SampleDataPriority(t *testing.T) {
 	// 高置信度的样例数据应该影响最终分类
 	if colResult.SampleConfidence >= 0.7 && colResult.EntityType != "phone" {
 		t.Logf("注意: 样例数据置信度高但最终实体类型不同, 可能需要检查优先级逻辑")
+	}
+}
+
+// TestShortWordThreshold 测试短词阈值分级
+func TestShortWordThreshold(t *testing.T) {
+	classifier := newTestClassifier(t)
+
+	// 3字符编辑距离1应该能匹配（评分0.67）
+	col := Column{Name: "agd", Description: "", DataType: "varchar"} // age的变体
+	entityType := classifier.identifyEntityType(col)
+	// 应该能匹配到 age 相关的实体（如果有）
+	t.Logf("3字符模糊匹配结果: %s", entityType)
+
+	// 4字符编辑距离1应该能匹配（评分0.75）
+	col2 := Column{Name: "datt", Description: "", DataType: "datetime"} // date的变体
+	entityType2 := classifier.identifyEntityType(col2)
+	t.Logf("4字符模糊匹配结果: %s", entityType2)
+}
+
+// TestEmptyAndNumericInput 测试空值和纯数字保护
+func TestEmptyAndNumericInput(t *testing.T) {
+	classifier := newTestClassifier(t)
+
+	// 空字符串
+	col1 := Column{Name: "", Description: "", DataType: "varchar"}
+	entityType1 := classifier.identifyEntityType(col1)
+	if entityType1 != "" {
+		t.Errorf("空字符串应返回空，实际: %s", entityType1)
+	}
+
+	// 纯数字
+	col2 := Column{Name: "12345", Description: "", DataType: "varchar"}
+	entityType2 := classifier.identifyEntityType(col2)
+	if entityType2 != "" {
+		t.Errorf("纯数字应返回空，实际: %s", entityType2)
+	}
+
+	// 带数字的混合（应该可以匹配）
+	col3 := Column{Name: "user123", Description: "", DataType: "varchar"}
+	entityType3 := classifier.identifyEntityType(col3)
+	t.Logf("混合字段匹配结果: %s", entityType3)
+}
+
+// TestTokenDeduplication 测试分词去重
+func TestTokenDeduplication(t *testing.T) {
+	classifier := newTestClassifier(t)
+
+	// 重复分隔符
+	words1 := classifier.splitColumnName("user__id")
+	words2 := classifier.splitColumnName("user_id")
+
+	if len(words1) != len(words2) {
+		t.Errorf("重复分隔符应产生相同分词数: user__id=%v, user_id=%v", words1, words2)
+	}
+
+	// 完全重复词
+	words3 := classifier.splitColumnName("user_user_id")
+	seen := make(map[string]bool)
+	for _, w := range words3 {
+		if seen[w] {
+			t.Errorf("分词结果应去重，发现重复: %s", w)
+		}
+		seen[w] = true
+	}
+}
+
+// TestSynonymDegradedThreshold 测试同义词降级阈值
+func TestSynonymDegradedThreshold(t *testing.T) {
+	classifier := newTestClassifier(t)
+
+	// establish_time 应该通过同义词降级匹配到 create_time 相关实体
+	col := Column{Name: "establish_time", Description: "", DataType: "datetime"}
+	entityType := classifier.identifyEntityType(col)
+	t.Logf("establish_time 匹配结果: %s", entityType)
+
+	// 应该能匹配到时间相关实体
+	if entityType == "" {
+		t.Logf("警告: establish_time 未匹配到任何实体")
 	}
 }
